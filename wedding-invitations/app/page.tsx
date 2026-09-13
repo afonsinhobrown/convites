@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSystemConfig } from "@/lib/config";
 import { TemplateThumbnail } from "@/components/templates/TemplateThumbnail";
-import { Heart } from "lucide-react";
+import { Heart, Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,14 @@ export default function HomePage() {
             </span>
           </div>
           <nav className="flex items-center gap-3 text-sm">
+            <Link
+              href="/designer/login"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              title="Acesso do designer"
+            >
+              <Palette className="h-4 w-4" />
+              Designer
+            </Link>
             <Link
               href="/organizer/login"
               className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100"
