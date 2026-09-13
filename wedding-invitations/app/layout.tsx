@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Great_Vibes, Inter, Playfair_Display } from "next/font/google";
+import {
+  Allura,
+  Cormorant_Garamond,
+  Great_Vibes,
+  Inter,
+  Lora,
+  Montserrat,
+  Pinyon_Script,
+  Playfair_Display,
+} from "next/font/google";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -16,7 +25,7 @@ const geistMono = localFont({
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
-  weight: ["400", "700"],
+  weight: ["400", "600", "700"],
 });
 const inter = Inter({
   subsets: ["latin"],
@@ -27,6 +36,31 @@ const greatVibes = Great_Vibes({
   subsets: ["latin"],
   variable: "--font-great-vibes",
   weight: "400",
+});
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["400", "600", "700"],
+});
+const pinyon = Pinyon_Script({
+  subsets: ["latin"],
+  variable: "--font-pinyon",
+  weight: "400",
+});
+const allura = Allura({
+  subsets: ["latin"],
+  variable: "--font-allura",
+  weight: "400",
+});
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["400", "600", "700"],
+});
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -42,7 +76,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${greatVibes.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${greatVibes.variable} ${cormorant.variable} ${pinyon.variable} ${allura.variable} ${montserrat.variable} ${lora.variable} antialiased`}
       >
         {children}
       </body>

@@ -1,4 +1,5 @@
 export type TextAlign = "left" | "center" | "right";
+export type TextTransform = "none" | "uppercase" | "lowercase";
 
 export interface LayoutField {
   x: number;
@@ -8,9 +9,14 @@ export interface LayoutField {
   fontSize: number;
   fontFamily: string;
   fontWeight?: number;
+  fontStyle?: "normal" | "italic";
   color: string;
   textAlign: TextAlign;
-  textTransform?: "uppercase" | "none";
+  textTransform?: TextTransform;
+  letterSpacing?: number;
+  lineHeight?: number;
+  sourceKey?: string;
+  locked?: boolean;
 }
 
 export type LayoutJson = Record<string, LayoutField>;
@@ -28,6 +34,53 @@ export const FIELD_ORDER = {
   locationName: "Nome do local",
   locationAddress: "Morada do local",
   rsvpContact: "Contacto RSVP",
+};
+
+export const FONT_FAMILIES = [
+  { label: "Playfair Display", value: "Playfair Display", clue: "Serifada elegante" },
+  { label: "Great Vibes", value: "Great Vibes", clue: "Cursiva romântica" },
+  { label: "Inter", value: "Inter", clue: "Sans-serif moderna" },
+  { label: "Cormorant Garamond", value: "Cormorant Garamond", clue: "Serifada clássica" },
+  { label: "Pinyon Script", value: "Pinyon Script", clue: "Cursiva formal" },
+  { label: "Allura", value: "Allura", clue: "Cursiva suave" },
+  { label: "Montserrat", value: "Montserrat", clue: "Sans-serif" },
+  { label: "Lora", value: "Lora", clue: "Serifada" },
+];
+
+export const PRESETS = {
+  name: {
+    label: "Estilo de Nome",
+    style: {
+      fontFamily: "Playfair Display",
+      fontSize: 64,
+      fontWeight: 700,
+      color: "#1A1A1A",
+      textTransform: "none" as TextTransform,
+      letterSpacing: 0,
+    },
+  },
+  phrase: {
+    label: "Estilo de Frase",
+    style: {
+      fontFamily: "Great Vibes",
+      fontSize: 39,
+      fontWeight: 400,
+      color: "#8B5A2B",
+      textTransform: "none" as TextTransform,
+      letterSpacing: 0,
+    },
+  },
+  label: {
+    label: "Estilo de Label",
+    style: {
+      fontFamily: "Inter",
+      fontSize: 25,
+      fontWeight: 600,
+      color: "#8B5A2B",
+      textTransform: "uppercase" as TextTransform,
+      letterSpacing: 5,
+    },
+  },
 };
 
 const BOLD = { fontWeight: 700 as const };
@@ -68,7 +121,7 @@ const BASE_H = 1536;
 // Visual pretendido (aprovado nos layouts): nomes 26px, dia/hora 20px,
 // mês/ano 10px, local 11px, morada 9px, RSVP 13px, convidado 10px.
 const S = BASE_W / 416; // ≈ 2.4615
-const FX = {
+export const FX = {
   guestName: 10 * S, // ≈ 25
   name: 26 * S, // ≈ 64
   day: 20 * S, // ≈ 49
@@ -79,9 +132,37 @@ const FX = {
   rsvp: 13 * S, // ≈ 32
 };
 
+// Fonte default por tipo de campo (ao adicionar/duplicar)
+export function defaultFontFor(key: string): string {
+  if (key === "guestName" || key === "invitationHeader" || key === "invitationIntro" || key === "invitationValues") {
+    return "Inter";
+  }
+  if (key === "invitationRomantic" || key === "invitationHonor" || key === "invitationFooter") {
+    return "Great Vibes";
+  }
+  return "Playfair Display";
+}
+
+export function emptyField(key: string): LayoutField {
+  const isName = key === "brideName" || key === "groomName";
+  const family = defaultFontFor(key);
+  return {
+    x: 320,
+    y: 100,
+    width: 400,
+    height: isName ? 160 : 60,
+    fontSize: isName || key === "day" || key === "time" ? FX.name : FX.small,
+    fontFamily: family,
+    fontWeight: isName ? 700 : undefined,
+    color: "#1A1A1A",
+    textAlign: "center",
+  };
+}
+
 function guestNameRow(): LayoutField {
   return f(257, 30, 510, 44, FX.guestName, sans, "#8B5A2B", {
     textTransform: "uppercase",
+    letterSpacing: 5,
   });
 }
 
@@ -150,9 +231,62 @@ export const DEFAULT_LAYOUTS: Record<string, LayoutJson> = {
 
 export const CANVAS = { width: BASE_W, height: BASE_H };
 
+// Classe CSS correspondente a uma família (as fontes são carregadas via
+// next/font e aplicadas por CSS variables; por isso nada de font-family inline).
+export function fontFamilyClass(fontFamily: string): string {
+  switch (fontFamily) {
+    case "Playfair Display":
+      return "font-serif-custom";
+    case "Great Vibes":
+      return "font-cursive-custom";
+    case "Inter":
+      return "font-sans-custom";
+    case "Cormorant Garamond":
+      return "font-cormorant";
+    case "Pinyon Script":
+      return "font-pinyon";
+    case "Allura":
+      return "font-allura";
+    case "Montserrat":
+      return "font-montserrat";
+    case "Lora":
+      return "font-lora";
+    default:
+      return "font-sans-custom";
+  }
+}
+
 // Valores que são renderizados com prefixo "DE " (mês/ano) conforme imagens
 export function fieldLabel(key: string): string {
   return FIELD_ORDER[key as FieldKey] ?? key;
+}
+
+function dataValue(key: string, data: Record<string, string | undefined>): string {
+  const realKey = data.sourceKey || key;
+  switch (realKey) {
+    case "guestName":
+      return `Convidado: ${data.guestName ?? ""}`.trim();
+    case "brideName":
+      return data.brideName ?? "";
+    case "groomName":
+      return data.groomName ?? "";
+    case "day":
+      return data.day ?? "";
+    case "month":
+      return `DE ${data.month ?? ""}`;
+    case "year":
+      return `DE ${data.year ?? ""}`;
+    case "time":
+      return data.time ?? "";
+    case "locationName":
+      return data.venue ?? "";
+    case "locationAddress":
+      return data.address ?? "";
+    case "rsvpContact":
+      return data.rsvpDate ? `${data.rsvpContact ?? ""} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "");
+    default:
+      return `${fieldLabel(realKey)}`;
+  }
 }
 
 export function getFieldValue(key: string, data: {
@@ -168,28 +302,28 @@ export function getFieldValue(key: string, data: {
   rsvpContact: string;
   rsvpDate?: string;
 }): string {
-  switch (key) {
-    case "guestName":
-      return `Convidado: ${data.guestName ?? ""}`.trim();
-    case "brideName":
-      return data.brideName;
-    case "groomName":
-      return data.groomName;
-    case "day":
-      return data.day;
-    case "month":
-      return `DE ${data.month}`;
-    case "year":
-      return `DE ${data.year}`;
-    case "time":
-      return data.time;
-    case "locationName":
-      return data.venue;
-    case "locationAddress":
-      return data.address;
-    case "rsvpContact":
-      return data.rsvpDate ? `${data.rsvpContact} · Até ${data.rsvpDate}` : data.rsvpContact;
-    default:
-      return "";
+  return dataValue(key, data as unknown as Record<string, string | undefined>);
+}
+
+export function getFieldValueWithSource(
+  key: string,
+  field: LayoutField | undefined,
+  data: {
+    guestName?: string;
+    brideName: string;
+    groomName: string;
+    day: string;
+    month: string;
+    year: string;
+    time: string;
+    venue: string;
+    address: string;
+    rsvpContact: string;
+    rsvpDate?: string;
   }
+): string {
+  if (field?.sourceKey) {
+    return `${fieldLabel(field.sourceKey)} (cópia): ${dataValue(field.sourceKey, { ...data } as unknown as Record<string, string | undefined>)}`;
+  }
+  return dataValue(key, data as unknown as Record<string, string | undefined>);
 }

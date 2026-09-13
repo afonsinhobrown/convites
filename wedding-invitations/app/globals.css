@@ -35,3 +35,18 @@ body {
 .font-cursive-custom {
   font-family: var(--font-great-vibes), "Great Vibes", "Brush Script MT", "Segoe Script", cursive;
 }
+.font-cormorant {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+.font-pinyon {
+  font-family: var(--font-pinyon), "Pinyon Script", "Segoe Script", cursive;
+}
+.font-allura {
+  font-family: var(--font-allura), "Allura", "Segoe Script", cursive;
+}
+.font-montserrat {
+  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
+}
+.font-lora {
+  font-family: var(--font-lora), "Lora", Georgia, serif;
+}

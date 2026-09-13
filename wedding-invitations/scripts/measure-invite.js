@@ -6,17 +6,13 @@ const EDGE = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
   await page.setViewport({ width: 480, height: 900 });
   await page.goto("http://localhost:3000/invite/31c3556673ccac5e98a6e95837fa39d7363af27555e8d7b0", { waitUntil: "networkidle0", timeout: 60000 });
   await new Promise(r=>setTimeout(r,2000));
-  const rows = await page.evaluate(() => {
-    const out = [];
-    for (const el of document.querySelectorAll("div")) {
-      const t = (el.textContent||"").trim();
-      if (t === "Ana" || t === "Zlatan" || t === "14:00" || t === "Praia do Bilene") {
-        const fs = parseFloat(getComputedStyle(el).fontSize);
-        out.push({ t, fontSize: Math.round(fs*10)/10 });
-      }
-    }
-    return out;
+  const info = await page.evaluate(() => {
+    const fields = [...document.querySelectorAll("div")]
+      .filter(el => el.textContent && ["Ana","Zlatan","14:00","Praia do Bilene"].includes(el.textContent.trim()))
+      .map(el => ({ t: el.textContent.trim(), cls: el.className }));
+    const layered = [...document.querySelectorAll("div")].find(el => el.style.width === "1024px");
+    return { fields, hasLayer: !!layered };
   });
-  console.log(JSON.stringify(rows, null, 2));
+  console.log(JSON.stringify(info, null, 2));
   await browser.close();
 })().catch(e => { console.error(e.message); process.exit(1); });

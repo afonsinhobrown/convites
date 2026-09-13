@@ -3,17 +3,11 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   CANVAS,
-  FIELD_ORDER,
-  getFieldValue,
+  fontFamilyClass,
+  getFieldValueWithSource,
   type LayoutJson,
 } from "@/lib/designer-layout";
 import type { InvitationData } from "./types";
-
-function fontStack(f: { fontFamily: string }) {
-  return f.fontFamily === "Great Vibes" || f.fontFamily === "Inter"
-    ? `"${f.fontFamily}", sans-serif`
-    : `"${f.fontFamily}", serif`;
-}
 
 export function LayoutFromJson({
   layoutJson,
@@ -54,34 +48,30 @@ export function LayoutFromJson({
           transformOrigin: "top left",
         }}
       >
-        {(Object.keys(FIELD_ORDER) as string[]).map((key) => {
-          const f = layoutJson[key];
-          if (!f) return null;
-          return (
-            <div
-              key={key}
-              className="flex items-center justify-center"
-              style={{
-                position: "absolute",
-                left: f.x,
-                top: f.y,
-                width: f.width,
-                height: f.height,
-                fontFamily: fontStack(f),
-                fontSize: f.fontSize,
-                fontWeight: f.fontWeight ?? 400,
-                color: f.color,
-                textAlign: f.textAlign,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                textTransform: (f as any).textTransform === "uppercase" ? "uppercase" : "none",
-                overflow: "hidden",
-                lineHeight: 1.1,
-              }}
-            >
-              {getFieldValue(key, data)}
-            </div>
-          );
-        })}
+        {Object.entries(layoutJson).map(([key, f]) => (
+          <div
+            key={key}
+            className={`flex items-center justify-center ${fontFamilyClass(f.fontFamily)}`}
+            style={{
+              position: "absolute",
+              left: f.x,
+              top: f.y,
+              width: f.width,
+              height: f.height,
+              fontSize: f.fontSize,
+              fontWeight: f.fontWeight ?? 400,
+              fontStyle: f.fontStyle ?? "normal",
+              color: f.color,
+              textAlign: f.textAlign,
+              textTransform: f.textTransform ?? "none",
+              letterSpacing: f.letterSpacing != null ? `${f.letterSpacing}px` : undefined,
+              lineHeight: f.lineHeight ?? 1.1,
+              overflow: "hidden",
+            }}
+          >
+            {getFieldValueWithSource(key, f, data)}
+          </div>
+        ))}
       </div>
     </div>
   );
