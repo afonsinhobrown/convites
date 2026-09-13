@@ -321,7 +321,7 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
   const realKey = data.sourceKey || key;
   switch (realKey) {
     case "guestName":
-      return `Convidado: ${data.guestName ?? ""}`.trim();
+      return data.guestName ?? "";
     case "brideName":
       return data.brideName ?? "";
     case "groomName":
@@ -339,17 +339,17 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
     case "locationAddress":
       return data.address ?? "";
     case "invitationHeader":
-      return data.invitationHeader ?? "CONVITE DE CASAMENTO";
+      return data.invitationHeader ?? "Com a Bênção de Deus";
     case "invitationIntro":
-      return data.invitationIntro ?? "Com grande alegria, juntos com as nossas famílias, convidamo-lo a celebrar o nosso casamento.";
+      return data.invitationIntro ?? "Temos a alegria de vos convidar para o nosso casamento";
     case "invitationRomantic":
-      return data.invitationRomantic ?? "E o que era segredo agora é uma história.";
+      return data.invitationRomantic ?? "Duas vidas, dois corações, uma história para toda a vida.";
     case "invitationHonor":
-      return data.invitationHonor ?? "Com a graça de Deus e a bênção dos nossos pais.";
+      return data.invitationHonor ?? "Será uma honra celebrar este momento tão especial na presença de vocês.";
     case "invitationFooter":
-      return data.invitationFooter ?? "Contamos com a sua presença.";
+      return data.invitationFooter ?? "Juntos para sempre";
     case "invitationValues":
-      return data.invitationValues ?? "AMOR · FÉ · FAMÍLIA";
+      return data.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre";
     case "rsvpContact":
       return data.rsvpDate ? `${data.rsvpContact ?? ""} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "");
     default:
@@ -387,8 +387,7 @@ export function getFieldValueWithSource(
   field: LayoutField | undefined,
   data: InvitationFieldData
 ): string {
-  if (field?.sourceKey) {
-    return `${fieldLabel(field.sourceKey)} (cópia): ${dataValue(field.sourceKey, { ...data } as unknown as Record<string, string | undefined>)}`;
-  }
-  return dataValue(key, data as unknown as Record<string, string | undefined>);
+  const realKey = field?.sourceKey || key;
+  const base = { ...data, sourceKey: undefined } as unknown as Record<string, string | undefined>;
+  return dataValue(realKey, base);
 }

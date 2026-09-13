@@ -10,6 +10,7 @@ import {
   FONT_FAMILIES,
   PRESETS,
   emptyField,
+  fieldLabel,
   fontFamilyClass,
   getFieldValueWithSource,
   type FieldKey,
@@ -491,6 +492,15 @@ return (
                       topLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
                     }}
                   >
+                    <div
+                      className="pointer-events-none absolute -top-6 left-0 z-index"
+                      style={{ zIndex: 50 }}
+                    >
+                      <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                        {fieldLabel(key)}
+                        {(key as string).includes("_cop") ? " (cópia)" : ""}
+                      </span>
+                    </div>
                     <div
                       className={`flex h-full w-full items-center justify-center px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
                       style={fieldStyle(f)}
