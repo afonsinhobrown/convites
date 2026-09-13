@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ MODELOS ============
+
+model Organizer {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  events        Event[]
+}
+
+model Event {
+  id                String    @id @default(uuid())
+  organizerId       String
+  organizer         Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  // Dados do casal
+  brideName         String
+  groomName         String
+  weddingDate       DateTime
+  ceremonyTime      String
+  ceremonyVenue     String
+  ceremonyAddress   String
+  receptionVenue    String?
+  receptionTime     String?
+
+  // Mensagem e RSVP
+  welcomeMessage    String?   @db.Text
+  rsvpDeadline      DateTime?
+  rsvpContact       String
+
+  // Template
+  templateSlug      String    @default("magnolia-gold")
+  themeSlug         String    @default("dourado")
+  templatePaidAt    DateTime?
+  templatePaymentRef String?
+
+  // Taxa por convidado
+  guestFeeCents     Int       @default(5000)
+  guestFeePaidAt    DateTime?
+  guestFeePaymentRef String?
+
+  // Configurações
+  showGallery       Boolean   @default(true)
+  showGifts         Boolean   @default(true)
+  showMessages      Boolean   @default(true)
+  showCountdown     Boolean   @default(true)
+
+  // Status
+  publishedAt       DateTime?
+  isSandbox         Boolean   @default(false)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  guests            Guest[]
+  photos            Photo[]
+  gifts             Gift[]
+  messages          Message[]
+
+  @@index([organizerId])
+}
+
+model Guest {
+  id              String    @id @default(uuid())
+  eventId         String
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  name            String
+  email           String?
+  phone           String?
+  group           String?
+
+  // RSVP
+  rsvpStatus      RsvpStatus @default(PENDING)
+  guestsCount     Int        @default(1)
+  maxCompanions   Int        @default(0)
+  dietaryNotes    String?    @db.Text
+  message         String?    @db.Text
+  respondedAt     DateTime?
+
+  // Token único
+  secureToken     String     @unique
+  qrToken         String     @unique
+  checkedInAt     DateTime?
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  companions      Companion[]
+
+  @@index([eventId])
+  @@index([secureToken])
+  @@index([qrToken])
+}
+
+model Companion {
+  id         String @id @default(uuid())
+  guestId    String
+  guest      Guest  @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  name       String
+  age        Int?
+  type       String   @default("OTHER")
+  checkedIn  Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+}
+
+enum RsvpStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+}
+
+model Photo {
+  id           String   @id @default(uuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  url          String
+  caption      String?
+  sortOrder    Int      @default(0)
+
+  createdAt    DateTime @default(now())
+}
+
+model Gift {
+  id           String   @id @default(uuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  type         String   // "MPESA", "EMOLA", "IBAN", "REGISTRY", "CUSTOM"
+  label        String
+  details      String   @db.Text
+  sortOrder    Int      @default(0)
+}
+
+model Message {
+  id           String   @id @default(uuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  guestName    String
+  body         String   @db.Text
+  approved     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model InvitationTemplate {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  name          String
+  description   String?
+  componentName String   // "MagnoliaGoldLayout", etc.
+  previewUrl    String?
+  layoutJson    Json?
+  priceUsdCents Int      // $15-$17 → 1500-1700
+  active        Boolean  @default(true)
+  sortOrder     Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SystemConfig {
+  id                    String @id @default(uuid())
+  invitationFeeCents    Int    @default(5000)   // taxa por convidado
+  bimExchangeRate       Int    @default(64)     // MT/USD
+  netshopEnabled        Boolean @default(true)
+  updatedAt             DateTime @updatedAt
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  eventId       String
+  type          PaymentType
+  amountCents   Int
+  currency      String   @default("MZN")
+  status        PaymentStatus @default(PENDING)
+  provider      String   @default("netshop")
+  providerRef   String?  @unique
+  metadata      Json?
+  confirmedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+enum PaymentType {
+  TEMPLATE
+  GUEST_FEE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
