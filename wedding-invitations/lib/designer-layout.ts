@@ -25,14 +25,20 @@ export type FieldKey = keyof typeof FIELD_ORDER;
 
 export const FIELD_ORDER = {
   guestName: "Convidado",
+  invitationHeader: "Cabeçalho",
   brideName: "Noiva",
   groomName: "Noivo",
+  invitationIntro: "Introdução",
   day: "Dia",
   month: "Mês",
   year: "Ano",
   time: "Hora",
+  invitationRomantic: "Frase romântica",
   locationName: "Nome do local",
   locationAddress: "Morada do local",
+  invitationHonor: "Homenagem",
+  invitationFooter: "Rodapé",
+  invitationValues: "Valores",
   rsvpContact: "Contacto RSVP",
 };
 
@@ -166,6 +172,38 @@ function guestNameRow(): LayoutField {
   });
 }
 
+function headerRow(y: number): LayoutField {
+  return f(257, y, 510, 44, FX.small, sans, "#8B5A2B", {
+    textTransform: "uppercase",
+    letterSpacing: 5,
+    fontWeight: 600,
+  });
+}
+
+function introRow(y: number): LayoutField {
+  return f(257, y, 510, 72, 25, sans, "#1A1A1A");
+}
+
+function romanticRow(y: number): LayoutField {
+  return f(257, y, 510, 62, 39, "Great Vibes", "#8B5A2B");
+}
+
+function honorRow(y: number): LayoutField {
+  return f(257, y, 510, 48, 32, "Great Vibes", "#1A1A1A");
+}
+
+function footerRow(y: number): LayoutField {
+  return f(257, y, 510, 40, 32, "Great Vibes", "#1A1A1A");
+}
+
+function valuesRow(y: number): LayoutField {
+  return f(257, y, 510, 36, FX.small, sans, "#8B5A2B", {
+    textTransform: "uppercase",
+    letterSpacing: 4,
+    fontWeight: 600,
+  });
+}
+
 // Magnolia Clássica — nomes centrados, dados em 3 colunas centrais
 const classicCenter = {
   baselineRows: (): Record<string, LayoutField> => ({
@@ -185,20 +223,28 @@ const classicCenter = {
 export const DEFAULT_LAYOUTS: Record<string, LayoutJson> = {
   "magnolia-classica": {
     guestName: guestNameRow(),
+    invitationHeader: headerRow(120),
     brideName: f(31, 369, 962, 160, FX.name, serif, "#1A1A1A", BOLD),
     groomName: f(31, 553, 962, 160, FX.name, serif, "#1A1A1A", BOLD),
+    invitationIntro: introRow(760),
     day: classicCenter.baselineRows().day,
     month: classicCenter.baselineRows().month,
     year: classicCenter.baselineRows().year,
     time: classicCenter.baselineRows().time,
+    invitationRomantic: romanticRow(840),
     locationName: classicCenter.baselineRows().locationName,
     locationAddress: classicCenter.baselineRows().locationAddress,
+    invitationHonor: honorRow(1180),
+    invitationFooter: footerRow(1250),
+    invitationValues: valuesRow(1310),
     rsvpContact: f(257, 1398, 510, 44, FX.rsvp, serif, "#1A1A1A", BOLD),
   },
   "magnolia-casal": {
     guestName: guestNameRow(),
+    invitationHeader: headerRow(120),
     brideName: f(491, 307, 502, 160, FX.name, serif, "#1A1A1A", BOLD),
     groomName: f(491, 538, 502, 160, FX.name, serif, "#1A1A1A", BOLD),
+    invitationIntro: introRow(760),
     day: f(491, 891, 181, 66, FX.day, serif, "#1A1A1A", BOLD),
     month: f(491, 957, 181, 34, FX.small, serif, "#1A1A1A", {
       textTransform: "uppercase",
@@ -207,14 +253,20 @@ export const DEFAULT_LAYOUTS: Record<string, LayoutJson> = {
       textTransform: "uppercase",
     }),
     time: f(692, 891, 126, 66, FX.time, serif, "#1A1A1A", BOLD),
+    invitationRomantic: romanticRow(840),
     locationName: f(833, 891, 160, 44, FX.location, serif, "#1A1A1A", BOLD),
     locationAddress: f(833, 935, 160, 40, FX.address, sans, "#1A1A1A"),
+    invitationHonor: honorRow(1180),
+    invitationFooter: footerRow(1250),
+    invitationValues: valuesRow(1310),
     rsvpContact: f(257, 1398, 510, 44, FX.rsvp, serif, "#1A1A1A", BOLD),
   },
   "magnolia-organica": {
     guestName: guestNameRow(),
+    invitationHeader: headerRow(120),
     brideName: f(491, 369, 502, 160, FX.name, serif, "#1A1A1A", BOLD),
     groomName: f(491, 568, 502, 160, FX.name, serif, "#1A1A1A", BOLD),
+    invitationIntro: introRow(790),
     day: f(491, 922, 181, 66, FX.day, serif, "#1A1A1A", BOLD),
     month: f(491, 988, 181, 34, FX.small, serif, "#1A1A1A", {
       textTransform: "uppercase",
@@ -223,8 +275,12 @@ export const DEFAULT_LAYOUTS: Record<string, LayoutJson> = {
       textTransform: "uppercase",
     }),
     time: f(692, 922, 126, 66, FX.time, serif, "#1A1A1A", BOLD),
+    invitationRomantic: romanticRow(870),
     locationName: f(833, 922, 160, 44, FX.location, serif, "#1A1A1A", BOLD),
     locationAddress: f(833, 966, 160, 40, FX.address, sans, "#1A1A1A"),
+    invitationHonor: honorRow(1210),
+    invitationFooter: footerRow(1280),
+    invitationValues: valuesRow(1340),
     rsvpContact: f(257, 1398, 510, 44, FX.rsvp, serif, "#1A1A1A", BOLD),
   },
 };
@@ -282,6 +338,18 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.venue ?? "";
     case "locationAddress":
       return data.address ?? "";
+    case "invitationHeader":
+      return data.invitationHeader ?? "CONVITE DE CASAMENTO";
+    case "invitationIntro":
+      return data.invitationIntro ?? "Com grande alegria, juntos com as nossas famílias, convidamo-lo a celebrar o nosso casamento.";
+    case "invitationRomantic":
+      return data.invitationRomantic ?? "E o que era segredo agora é uma história.";
+    case "invitationHonor":
+      return data.invitationHonor ?? "Com a graça de Deus e a bênção dos nossos pais.";
+    case "invitationFooter":
+      return data.invitationFooter ?? "Contamos com a sua presença.";
+    case "invitationValues":
+      return data.invitationValues ?? "AMOR · FÉ · FAMÍLIA";
     case "rsvpContact":
       return data.rsvpDate ? `${data.rsvpContact ?? ""} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "");
     default:
@@ -289,7 +357,7 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
   }
 }
 
-export function getFieldValue(key: string, data: {
+export type InvitationFieldData = {
   guestName?: string;
   brideName: string;
   groomName: string;
@@ -301,26 +369,23 @@ export function getFieldValue(key: string, data: {
   address: string;
   rsvpContact: string;
   rsvpDate?: string;
-}): string {
+  welcomeMessage?: string;
+  invitationHeader?: string;
+  invitationIntro?: string;
+  invitationRomantic?: string;
+  invitationHonor?: string;
+  invitationFooter?: string;
+  invitationValues?: string;
+};
+
+export function getFieldValue(key: string, data: InvitationFieldData): string {
   return dataValue(key, data as unknown as Record<string, string | undefined>);
 }
 
 export function getFieldValueWithSource(
   key: string,
   field: LayoutField | undefined,
-  data: {
-    guestName?: string;
-    brideName: string;
-    groomName: string;
-    day: string;
-    month: string;
-    year: string;
-    time: string;
-    venue: string;
-    address: string;
-    rsvpContact: string;
-    rsvpDate?: string;
-  }
+  data: InvitationFieldData
 ): string {
   if (field?.sourceKey) {
     return `${fieldLabel(field.sourceKey)} (cópia): ${dataValue(field.sourceKey, { ...data } as unknown as Record<string, string | undefined>)}`;

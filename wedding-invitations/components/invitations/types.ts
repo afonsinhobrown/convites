@@ -11,4 +11,10 @@ export interface InvitationData {
   rsvpContact: string;
   rsvpDate?: string;
   welcomeMessage?: string;
+  invitationHeader?: string;
+  invitationIntro?: string;
+  invitationRomantic?: string;
+  invitationHonor?: string;
+  invitationFooter?: string;
+  invitationValues?: string;
 }
