@@ -168,11 +168,11 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
     lineHeight: f.lineHeight ?? 1.1,
     overflow: "hidden",
   });
-
-  return (
-    <main className="min-h-screen bg-gray-100">
+return (
+    <main className="flex h-screen flex-col bg-gray-100">
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
         <div>
+
           <h1 className="text-lg font-semibold text-gray-900">{template.name}</h1>
           <p className="text-xs text-gray-500">slug: {template.slug}</p>
         </div>
@@ -207,76 +207,9 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
         </div>
       </header>
 
-      <div className="flex">
-        {/* Cena desenhável */}
-        <div className="flex-1 overflow-auto p-6">
-          <div
-            ref={frameRef}
-            className="relative mx-auto overflow-hidden rounded-lg shadow-xl ring-1 ring-gray-200"
-            style={{ width: CANVAS.width * zoom, height: CANVAS.height * zoom }}
-          >
-            <div className="absolute left-0 top-0" style={frameStyle}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={template.previewUrl ?? "/templates/magnolia-classica/fundo.png"}
-                alt="Fundo do convite"
-                className="pointer-events-none absolute left-0 top-0 select-none"
-                style={{ width: CANVAS.width, height: CANVAS.height }}
-              />
-
-              {/* Campos arrastáveis */}
-              {orderedKeys(layout).map((key) => {
-                const f = layout[key as string] as LayoutField;
-                const isSelected = selected === key;
-                const locked = !!f.locked;
-                return (
-                  <Rnd
-                    key={key}
-                    size={{ width: f.width, height: f.height }}
-                    position={{ x: f.x, y: f.y }}
-                    scale={zoom}
-                    bounds="parent"
-                    disableDragging={locked}
-                    enableResizing={!locked}
-                    onDragStop={(_e, d) => updateField(key, { x: d.x, y: d.y })}
-                    onResizeStop={(_e, _dir, ref, _delta, pos) =>
-                      updateField(key, {
-                        width: parseInt(ref.style.width, 10),
-                        height: parseInt(ref.style.height, 10),
-                        x: pos.x,
-                        y: pos.y,
-                      })
-                    }
-                    onDragStart={() => setSelected(key)}
-                    onResizeStart={() => setSelected(key)}
-                    onMouseDown={() => setSelected(key)}
-                    className={isSelected ? "z-20" : "z-10"}
-                    style={{
-                      border: isSelected ? "2px solid #e11d48" : "1px dashed transparent",
-                      cursor: locked ? "default" : undefined,
-                    }}
-                    resizeHandleStyles={{
-                      bottomRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      bottomLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      topRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      topLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                    }}
-                  >
-                    <div
-                      className={`flex h-full w-full items-center justify-center px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
-                      style={fieldStyle(f)}
-                    >
-                      {getFieldValueWithSource(key, f, SAMPLE_DATA)}
-                    </div>
-                  </Rnd>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
+      <div className="flex flex-1 overflow-hidden">
         {/* Painel de propriedades */}
-        <aside className="w-80 shrink-0 overflow-y-auto border-l border-gray-200 bg-white p-4">
+        <aside className="w-80 shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-gray-700">Campos</h2>
           <div className="mb-5 grid grid-cols-2 gap-1.5">
             {orderedKeys(layout).map((key) => {
@@ -503,6 +436,73 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
             </Section>
           </div>
         </aside>
+
+        {/* Cena desenhável */}
+        <div className="flex-1 overflow-auto p-6">
+          <div
+            ref={frameRef}
+            className="relative mx-auto overflow-hidden rounded-lg shadow-xl ring-1 ring-gray-200"
+            style={{ width: CANVAS.width * zoom, height: CANVAS.height * zoom }}
+          >
+            <div className="absolute left-0 top-0" style={frameStyle}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={template.previewUrl ?? "/templates/magnolia-classica/fundo.png"}
+                alt="Fundo do convite"
+                className="pointer-events-none absolute left-0 top-0 select-none"
+                style={{ width: CANVAS.width, height: CANVAS.height }}
+              />
+
+              {/* Campos arrastáveis */}
+              {orderedKeys(layout).map((key) => {
+                const f = layout[key as string] as LayoutField;
+                const isSelected = selected === key;
+                const locked = !!f.locked;
+                return (
+                  <Rnd
+                    key={key}
+                    size={{ width: f.width, height: f.height }}
+                    position={{ x: f.x, y: f.y }}
+                    scale={zoom}
+                    bounds="parent"
+                    disableDragging={locked}
+                    enableResizing={!locked}
+                    onDragStop={(_e, d) => updateField(key, { x: d.x, y: d.y })}
+                    onResizeStop={(_e, _dir, ref, _delta, pos) =>
+                      updateField(key, {
+                        width: parseInt(ref.style.width, 10),
+                        height: parseInt(ref.style.height, 10),
+                        x: pos.x,
+                        y: pos.y,
+                      })
+                    }
+                    onDragStart={() => setSelected(key)}
+                    onResizeStart={() => setSelected(key)}
+                    onMouseDown={() => setSelected(key)}
+                    className={isSelected ? "z-20" : "z-10"}
+                    style={{
+                      border: isSelected ? "2px solid #e11d48" : "1px dashed transparent",
+                      cursor: locked ? "default" : undefined,
+                    }}
+                    resizeHandleStyles={{
+                      bottomRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                      bottomLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                      topRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                      topLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                    }}
+                  >
+                    <div
+                      className={`flex h-full w-full items-center justify-center px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
+                      style={fieldStyle(f)}
+                    >
+                      {getFieldValueWithSource(key, f, SAMPLE_DATA)}
+                    </div>
+                  </Rnd>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
