@@ -7,6 +7,7 @@ import { Palette } from "lucide-react";
 export function DesignerLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -17,16 +18,16 @@ export function DesignerLoginForm() {
     setError(null);
 
     try {
-      const res = await fetch("/api/superadmin/login", {
+      const res = await fetch("/api/designer/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError(data.error ?? "Password incorreta");
+        setError(data.error ?? "Credenciais inválidas");
         return;
       }
 
@@ -51,7 +52,23 @@ export function DesignerLoginForm() {
             <Palette className="h-6 w-6 text-rose-700" />
           </span>
           <h1 className="text-xl font-semibold text-gray-900">Acesso do Designer</h1>
-          <p className="text-sm text-gray-500">Introduza a password para continuar.</p>
+          <p className="text-sm text-gray-500">Introduza as suas credenciais para continuar.</p>
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            autoFocus
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+          />
         </div>
 
         <div>
@@ -61,7 +78,7 @@ export function DesignerLoginForm() {
           <input
             id="password"
             type="password"
-            autoFocus
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}

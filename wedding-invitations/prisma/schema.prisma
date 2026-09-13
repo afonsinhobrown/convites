@@ -161,20 +161,38 @@ model Message {
   @@index([eventId])
 }
 
-model InvitationTemplate {
+model Designer {
   id            String   @id @default(uuid())
-  slug          String   @unique
+  email         String   @unique
+  passwordHash  String
   name          String
-  description   String?
-  componentName String   // "MagnoliaGoldLayout", etc.
-  previewUrl    String?
-  layoutJson    Json?
-  priceUsdCents Int      // $15-$17 → 1500-1700
   active        Boolean  @default(true)
-  sortOrder     Int      @default(0)
-
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  layoutsEdited InvitationTemplate[]
+}
+
+model InvitationTemplate {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  name          String
+  description   String?
+  componentName String    // "MagnoliaGoldLayout", etc.
+  previewUrl    String?
+  layoutJson    Json?
+  priceUsdCents Int       // $15-$17 → 1500-1700
+  active        Boolean   @default(true)
+  sortOrder     Int       @default(0)
+
+  editedById    String?
+  editedBy      Designer? @relation(fields: [editedById], references: [id])
+  editedAt      DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([editedById])
 }
 
 model SystemConfig {

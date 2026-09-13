@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { DESIGNER_COOKIE_NAME, verifyDesignerSessionToken } from "@/lib/designer-auth";
 
 export async function PATCH(request: Request, { params }: { params: { templateId: string } }) {
   try {
-    const token = cookies().get("superadmin_token")?.value;
-    if (!token || token !== process.env.SUPERADMIN_COOKIE_SECRET) {
+    const token = cookies().get(DESIGNER_COOKIE_NAME)?.value;
+    const designerId = token ? await verifyDesignerSessionToken(token) : null;
+    if (!designerId) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    const designer = await prisma.designer.findUnique({ where: { id: designerId } });
+    if (!designer || !designer.active) {
+      return NextResponse.json({ error: "Designer inativo" }, { status: 403 });
     }
 
     const body = await request.json().catch(() => null);
@@ -16,7 +23,7 @@ export async function PATCH(request: Request, { params }: { params: { templateId
 
     const template = await prisma.invitationTemplate.update({
       where: { slug: params.templateId },
-      data: { layoutJson: body.layoutJson },
+      data: { layoutJson: body.layoutJson, editedById: designerId, editedAt: new Date() },
     });
 
     return NextResponse.json({ id: template.id, slug: template.slug, layoutJson: template.layoutJson });

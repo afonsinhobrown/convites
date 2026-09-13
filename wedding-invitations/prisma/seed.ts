@@ -1,9 +1,21 @@
 import { PrismaClient } from '@prisma/client'
 import { DEFAULT_LAYOUTS } from '../lib/designer-layout'
+import { hashPassword } from '../lib/organizer-password'
 
 const prisma = new PrismaClient()
 
 async function main() {
+  console.log('Seeding Designer...')
+  await prisma.designer.upsert({
+    where: { email: 'designer@doremi.local' },
+    update: { name: 'Designer Doremi', passwordHash: hashPassword('designer123'), active: true },
+    create: {
+      email: 'designer@doremi.local',
+      name: 'Designer Doremi',
+      passwordHash: hashPassword('designer123'),
+    },
+  })
+
   console.log('Seeding Invitation Templates...')
   
   const templates = [

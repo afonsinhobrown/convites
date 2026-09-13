@@ -3,6 +3,7 @@ import {
   ORGANIZER_COOKIE_NAME,
   verifyOrganizerSessionToken,
 } from "@/lib/organizer-auth";
+import { DESIGNER_COOKIE_NAME, verifyDesignerSessionToken } from "@/lib/designer-auth";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -24,8 +25,9 @@ export async function middleware(request: NextRequest) {
 
   if (isDesignerRoute) {
     if (pathname === "/designer/login" || pathname === "/api/designer/login") return NextResponse.next();
-    const token = request.cookies.get("superadmin_token")?.value;
-    if (token !== process.env.SUPERADMIN_COOKIE_SECRET) {
+    const token = request.cookies.get(DESIGNER_COOKIE_NAME)?.value;
+    const designerId = token ? await verifyDesignerSessionToken(token) : null;
+    if (!designerId) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
       }

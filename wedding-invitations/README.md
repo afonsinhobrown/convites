@@ -1,6 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Acesso Designer (editor visual)
+
+Credenciais default (criadas pelo seed):
+
+- Email: `designer@doremi.local`
+- Password: `designer123`
+
+Login em `/designer/login`. O acesso é independente do superadmin
+(cookie `designer_token`, assinatura HMAC própria).
+
+# Acesso Superadmin
+
+- `/superadmin/login` — gerido por `SUPERADMIN_PASSWORD` no `.env`.
+
+# Getting Started
 
 First, run the development server:
 
