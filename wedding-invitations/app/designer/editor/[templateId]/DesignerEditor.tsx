@@ -47,8 +47,8 @@ function defaultLayout(slug: string): LayoutJson {
 }
 
 function orderedKeys(layout: LayoutJson): FieldKey[] {
-  const base = Object.keys(FIELD_ORDER) as FieldKey[];
-  const extra = Object.keys(layout).filter((k) => !base.includes(k as FieldKey)) as FieldKey[];
+  const base = (Object.keys(FIELD_ORDER) as FieldKey[]).filter((k) => k in layout);
+  const extra = Object.keys(layout).filter((k) => !Object.keys(FIELD_ORDER).includes(k as FieldKey)) as FieldKey[];
   return [...base, ...extra];
 }
 
@@ -259,7 +259,7 @@ return (
                 >
                   {FIELD_ORDER[key] ?? key}
                   {copied ? <span className="opacity-70"> (cópia)</span> : null}
-                  {layout[key as string].locked ? " 🔒" : ""}
+                  {layout[key as string]?.locked ? " 🔒" : ""}
                 </button>
               );
             })}
