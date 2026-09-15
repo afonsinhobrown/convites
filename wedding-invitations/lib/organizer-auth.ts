@@ -17,10 +17,20 @@ function base64UrlToBytes(value: string): Uint8Array {
   return bytes;
 }
 
+function getSecret(): string {
+  const secret = process.env.ORGANIZER_COOKIE_SECRET;
+  if (!secret) {
+    throw new Error(
+      "ORGANIZER_COOKIE_SECRET não está definida — define-a na Vercel (Settings → Environment Variables)."
+    );
+  }
+  return secret;
+}
+
 async function hmacSign(data: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    enc.encode(process.env.ORGANIZER_COOKIE_SECRET ?? ""),
+    enc.encode(getSecret()),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
