@@ -25,7 +25,7 @@ async function main() {
   //   layout+demo do próprio casal para renderizar na montra.
   // - esmeralda-fotos fica só com o fundo próprio (montra usa a thumbnail).
   const templates = [
-    { slug: 'magnolia-classica', name: 'Magnólia Clássica', componentName: 'MagnoliaClassicaLayout', priceUsdCents: 1500, sortOrder: 1, previewUrl: '/templates/magnolia-classica/fundo.png' },
+    { slug: 'magnolia-classica', name: 'Magnólia Clássica', componentName: 'MagnoliaClassicaLayout', priceUsdCents: 1500, sortOrder: 1, previewUrl: '/templates/magnolia-classica/fundo.png', status: 'PUBLISHED', publishedAt: new Date() },
     { slug: 'magnolia-casal', name: 'Magnólia Casal', componentName: 'MagnoliaCasalLayout', priceUsdCents: 1700, sortOrder: 2, previewUrl: '/templates/magnolia-casal/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-casal'], demoData: DEMO_DATA },
     { slug: 'magnolia-organica', name: 'Magnólia Orgânica', componentName: 'MagnoliaOrganicaLayout', priceUsdCents: 1600, sortOrder: 3, previewUrl: '/templates/magnolia-organica/fundo.png' },
     { slug: 'magnolia-dourada-casal', name: 'Magnólia Dourada Casal', componentName: 'MagnoliaCasalLayout', priceUsdCents: 1800, sortOrder: 4, previewUrl: '/templates/magnolia-dourada-casal/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-casal'], demoData: DEMO_DATA, parentId: (await prisma.invitationTemplate.findUnique({ where: { slug: 'magnolia-casal' }, select: { id: true } }))?.id },
@@ -41,6 +41,11 @@ async function main() {
       create: t as any,
     })
   }
+
+  await prisma.invitationTemplate.updateMany({
+    where: { slug: { in: ['magnolia-classica', 'magnolia-casal', 'magnolia-organica'] } },
+    data: { status: 'PUBLISHED', publishedAt: new Date() },
+  })
 
   console.log('Seeding Assets (ficheiros reais de ASSETS/ no designer)...')
   // Aditivo: correspondência 1:1 com os PNGs copiados para public/assets/.

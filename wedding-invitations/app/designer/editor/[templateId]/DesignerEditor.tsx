@@ -176,6 +176,38 @@ return (
 
           <h1 className="text-lg font-semibold text-gray-900">{template.name}</h1>
           <p className="text-xs text-gray-500">slug: {template.slug}</p>
+          <div className="mt-1 flex items-center gap-2">
+            <span
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                template.status === "PUBLISHED"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : template.status === "ARCHIVED"
+                    ? "bg-gray-200 text-gray-600"
+                    : "bg-amber-100 text-amber-700"
+              }`}
+            >
+              {template.status}
+            </span>
+            {template.status === "PUBLISHED" && template.publishedAt ? (
+              <span className="text-[11px] text-gray-400">
+                publicado {new Date(template.publishedAt).toLocaleDateString("pt-PT")}
+              </span>
+            ) : null}
+            <button
+              onClick={async () => {
+                const next = template.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+                const res = await fetch(
+                  `/api/designer/templates/${template.slug}/status`,
+                  { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: next }) }
+                );
+                if (res.ok) window.location.reload();
+                else alert((await res.json().catch(() => ({}))).error ?? "Erro ao mudar estado");
+              }}
+              className="rounded-lg border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            >
+              {template.status === "PUBLISHED" ? "Despublicar" : "Publicar"}
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <button
