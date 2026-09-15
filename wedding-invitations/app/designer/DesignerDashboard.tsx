@@ -101,7 +101,7 @@ function TemplateCard({
           <h2 className="font-semibold text-gray-900">{template.name}</h2>
           <p className="text-xs text-gray-400 mt-0.5">{template.slug}</p>
           <p className="text-sm font-medium text-rose-600 mt-1">
-            {template.price != null ? `${Number(template.price).toFixed(0)}€` : "—"}
+            {template.priceUsdCents != null ? `$${(template.priceUsdCents / 100).toFixed(0)}` : "—"}
           </p>
         </div>
 
