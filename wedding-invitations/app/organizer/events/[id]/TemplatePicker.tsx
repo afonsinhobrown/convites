@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TemplateThumbnail } from "@/components/templates/TemplateThumbnail";
+import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { Check } from "lucide-react";
 
 interface TemplateOption {
@@ -10,6 +10,9 @@ interface TemplateOption {
   name: string;
   priceUsdCents: number;
   previewUrl?: string | null;
+  componentName: string;
+  layoutJson?: unknown;
+  demoData?: unknown;
 }
 
 export function TemplatePicker({
@@ -72,7 +75,15 @@ export function TemplatePicker({
                   <Check className="h-3.5 w-3.5 text-white" />
                 </span>
               )}
-              <TemplateThumbnail slug={t.slug} name={t.name} previewUrl={t.previewUrl} className="aspect-[2/3]" />
+              <TemplatePreview
+                slug={t.slug}
+                name={t.name}
+                componentName={t.componentName}
+                previewUrl={t.previewUrl}
+                layoutJson={t.layoutJson}
+                demoData={t.demoData}
+                className="aspect-[2/3]"
+              />
               <p className="mt-2 text-sm font-medium text-gray-900">{t.name}</p>
               <p className="text-xs text-gray-500">US$ {(t.priceUsdCents / 100).toFixed(2)}</p>
             </button>

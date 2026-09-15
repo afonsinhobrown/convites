@@ -1,9 +1,25 @@
-import type { InvitationData } from "../types";
+import type { InvitationData, InvitationMode } from "../types";
 
-export function BasicLayout({ data }: { data: InvitationData }) {
+export function BasicLayout({
+  data,
+  mode = "preview",
+}: {
+  data: InvitationData;
+  mode?: InvitationMode;
+}) {
   return (
     <div className="relative w-full max-w-md mx-auto bg-white text-gray-900 overflow-hidden shadow-2xl rounded-lg border border-gray-200 aspect-[2/3]">
       <div className="flex flex-col items-center justify-center h-full p-8 text-center gap-5">
+        {mode === "for_print" ? (
+          <span
+            data-guest-line
+            className="inline-block w-1/2 border-b border-dashed border-gray-400"
+          />
+        ) : data.guestName ? (
+          <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
+            Convidado: {data.guestName}
+          </p>
+        ) : null}
         <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
           Convite de casamento
         </p>

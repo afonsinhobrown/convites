@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
-import { formatEventDate, getBaseUrl } from "@/lib/invitation";
+import { formatEventDate, getBaseUrl, eventToInvitationData } from "@/lib/invitation";
 import { ArrowLeft } from "lucide-react";
 import { TemplatePicker } from "./TemplatePicker";
 import { GuestForm } from "./GuestForm";
@@ -40,6 +40,9 @@ export default async function EditEventPage({ params }: { params: { id: string }
     inviteUrl: g.secureToken ? `${baseUrl}/invite/${g.secureToken}` : null,
   }));
 
+  const currentTemplate = templates.find((t) => t.slug === event.templateSlug);
+  const eventData = eventToInvitationData(event);
+
   return (
     <main className="min-h-screen bg-[#FDFBF7]">
       <header className="border-b border-[#C5A059]/30 bg-white">
@@ -75,7 +78,16 @@ export default async function EditEventPage({ params }: { params: { id: string }
           </div>
           <div>
             <h2 className="mb-3 text-lg font-semibold text-gray-900">Convites</h2>
-            <InvitesPanel eventId={event.id} initialGuests={inviteGuests} />
+            <InvitesPanel
+              eventId={event.id}
+              initialGuests={inviteGuests}
+              eventData={eventData}
+              template={{
+                layout: currentTemplate?.componentName ?? event.templateSlug,
+                layoutJson: currentTemplate?.layoutJson ?? null,
+                previewUrl: currentTemplate?.previewUrl ?? null,
+              }}
+            />
           </div>
         </section>
       </div>

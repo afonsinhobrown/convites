@@ -1,3 +1,5 @@
+export type InvitationMode = "preview" | "for_print" | "for_guest";
+
 export interface InvitationData {
   guestName?: string;
   brideName: string;

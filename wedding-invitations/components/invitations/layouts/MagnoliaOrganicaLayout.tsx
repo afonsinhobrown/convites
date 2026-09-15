@@ -2,9 +2,16 @@
 
 import Image from "next/image";
 import { AutoFitText } from "../AutoFitText";
-import type { InvitationData } from "../types";
+import { GuestNameOverlay } from "../GuestNameOverlay";
+import type { InvitationData, InvitationMode } from "../types";
 
-export function MagnoliaOrganicaLayout({ data }: { data: InvitationData }) {
+export function MagnoliaOrganicaLayout({
+  data,
+  mode = "preview",
+}: {
+  data: InvitationData;
+  mode?: InvitationMode;
+}) {
   return (
     <div className="relative w-full max-w-md mx-auto aspect-[2/3]">
       <Image
@@ -15,23 +22,7 @@ export function MagnoliaOrganicaLayout({ data }: { data: InvitationData }) {
         className="object-cover z-0"
       />
 
-      {data.guestName && (
-        <div
-          className="absolute z-10 font-sans-custom"
-          style={{
-            top: "2%",
-            left: "10%",
-            right: "10%",
-            textAlign: "center",
-            fontSize: "10px",
-            color: "#8B5A2B",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-          }}
-        >
-          Convidado: {data.guestName}
-        </div>
-      )}
+<GuestNameOverlay guestName={data.guestName} mode={mode} />
 
       <div
         className="absolute z-10"

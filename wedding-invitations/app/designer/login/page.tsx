@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { DesignerLoginForm } from "./LoginForm";
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 };
 
 export default function LoginPage() {
-  return <DesignerLoginForm />;
+  return (
+    <Suspense fallback={null}>
+      <DesignerLoginForm />
+    </Suspense>
+  );
 }

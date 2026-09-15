@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSystemConfig } from "@/lib/config";
-import { TemplateThumbnail } from "@/components/templates/TemplateThumbnail";
+import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { Heart, Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -76,7 +76,15 @@ async function Gallery() {
             href="/organizer/register"
             className="group rounded-2xl border border-[#C5A059]/20 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <TemplateThumbnail slug={t.slug} name={t.name} previewUrl={t.previewUrl} className="aspect-[2/3]" />
+            <TemplatePreview
+              slug={t.slug}
+              name={t.name}
+              componentName={t.componentName}
+              previewUrl={t.previewUrl}
+              layoutJson={t.layoutJson}
+              demoData={t.demoData}
+              className="aspect-[2/3]"
+            />
             <div className="mt-3">
               <h2 className="text-sm font-semibold text-gray-900">{t.name}</h2>
               <p className="mt-1 text-sm text-gray-500">

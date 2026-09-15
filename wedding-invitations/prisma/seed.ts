@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { DEFAULT_LAYOUTS } from '../lib/designer-layout'
 import { hashPassword } from '../lib/organizer-password'
+import { DEMO_DATA } from '../lib/demo-data'
 
 const prisma = new PrismaClient()
 
@@ -35,10 +36,11 @@ async function main() {
   ]
 
   for (const t of templates) {
+    const data = { ...t, demoData: DEMO_DATA }
     await prisma.invitationTemplate.upsert({
       where: { slug: t.slug } as any,
-      update: t as any,
-      create: t as any,
+      update: data as any,
+      create: data as any,
     })
   }
 

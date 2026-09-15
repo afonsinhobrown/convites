@@ -2,9 +2,15 @@
 
 import { Calendar, Clock, MapPin, Heart, MessageCircle } from "lucide-react";
 import { AutoFitText } from "../AutoFitText";
-import type { InvitationData } from "../types";
+import type { InvitationData, InvitationMode } from "../types";
 
-export function MagnoliaGoldLayout({ data }: { data: InvitationData }) {
+export function MagnoliaGoldLayout({
+  data,
+  mode = "preview",
+}: {
+  data: InvitationData;
+  mode?: InvitationMode;
+}) {
   return (
     <div className="relative w-full max-w-md mx-auto bg-[#FDFBF7] text-[#1A1A1A] overflow-hidden shadow-2xl rounded-lg aspect-[2/3]">
       <div className="absolute inset-0 z-0">
@@ -14,6 +20,18 @@ export function MagnoliaGoldLayout({ data }: { data: InvitationData }) {
       </div>
 
       <div className="relative z-10 flex flex-col h-full p-6 sm:p-8">
+        {mode === "for_print" ? (
+          <div className="flex justify-center pb-3">
+            <span
+              data-guest-line
+              className="inline-block w-1/2 border-b border-dashed border-[#8B5A2B]/60"
+            />
+          </div>
+        ) : data.guestName ? (
+          <p className="text-[9px] font-sans-custom font-bold uppercase tracking-[0.25em] text-[#8B5A2B] text-center pb-3">
+            Convidado: {data.guestName}
+          </p>
+        ) : null}
         <div className="text-center space-y-2">
           <p className="text-[10px] font-sans-custom font-bold uppercase tracking-[0.25em] text-[#8B5A2B]">
             Com a Bênção de Deus

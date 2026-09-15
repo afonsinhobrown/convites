@@ -7,16 +7,49 @@ import {
   getFieldValueWithSource,
   type LayoutJson,
 } from "@/lib/designer-layout";
-import type { InvitationData } from "./types";
+import type { InvitationData, InvitationMode } from "./types";
+
+const isGuestName = (key: string, field?: { sourceKey?: string }) =>
+  (field?.sourceKey ?? key) === "guestName";
+
+function GuestNameRender({
+  mode,
+  value,
+}: {
+  mode: InvitationMode;
+  value: string;
+}) {
+  if (mode === "for_print") {
+    return (
+      <span
+        data-guest-line
+        className="inline-block"
+        style={{
+          width: "60%",
+          maxWidth: 420,
+          borderBottom: "1px dashed rgba(139, 90, 43, 0.55)",
+          height: 0,
+        }}
+        aria-label="Nome do convidado"
+      />
+    );
+  }
+  if (mode === "for_guest") {
+    return <>{value}</>;
+  }
+  return <>{value}</>;
+}
 
 export function LayoutFromJson({
   layoutJson,
   previewUrl,
   data,
+  mode = "preview",
 }: {
   layoutJson: LayoutJson;
   previewUrl?: string | null;
   data: InvitationData;
+  mode?: InvitationMode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
@@ -69,7 +102,11 @@ export function LayoutFromJson({
               overflow: "hidden",
             }}
           >
-            {getFieldValueWithSource(key, f, data)}
+            {isGuestName(key, f) ? (
+              <GuestNameRender mode={mode} value={getFieldValueWithSource(key, f, data)} />
+            ) : (
+              getFieldValueWithSource(key, f, data)
+            )}
           </div>
         ))}
       </div>

@@ -181,6 +181,7 @@ model InvitationTemplate {
   componentName String    // "MagnoliaGoldLayout", etc.
   previewUrl    String?
   layoutJson    Json?
+  demoData      Json?     // dados fictícios para a montra/preview
   priceUsdCents Int       // $15-$17 → 1500-1700
   active        Boolean   @default(true)
   sortOrder     Int       @default(0)
