@@ -18,19 +18,21 @@ async function main() {
   })
 
   console.log('Seeding Invitation Templates...')
-  
+
+  // Apenas os 3 templates Magnólia. Só o magnolia-casal (o que o designer
+  // editou) tem demoData completo + layout; os restantes ficam vazios para
+  // a montra distinguir o template editado dos outros.
   const templates = [
-    { slug: 'magnolia-classica', name: 'Magnólia Clássica', componentName: 'MagnoliaClassicaLayout', priceUsdCents: 1500, sortOrder: 1, previewUrl: '/templates/magnolia-classica/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-classica'] },
-    { slug: 'magnolia-casal', name: 'Magnólia Casal', componentName: 'MagnoliaCasalLayout', priceUsdCents: 1700, sortOrder: 2, previewUrl: '/templates/magnolia-casal/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-casal'] },
-    { slug: 'magnolia-organica', name: 'Magnólia Orgânica', componentName: 'MagnoliaOrganicaLayout', priceUsdCents: 1600, sortOrder: 3, previewUrl: '/templates/magnolia-organica/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-organica'] },
+    { slug: 'magnolia-classica', name: 'Magnólia Clássica', componentName: 'MagnoliaClassicaLayout', priceUsdCents: 1500, sortOrder: 1, previewUrl: '/templates/magnolia-classica/fundo.png' },
+    { slug: 'magnolia-casal', name: 'Magnólia Casal', componentName: 'MagnoliaCasalLayout', priceUsdCents: 1700, sortOrder: 2, previewUrl: '/templates/magnolia-casal/fundo.png', layoutJson: DEFAULT_LAYOUTS['magnolia-casal'], demoData: DEMO_DATA },
+    { slug: 'magnolia-organica', name: 'Magnólia Orgânica', componentName: 'MagnoliaOrganicaLayout', priceUsdCents: 1600, sortOrder: 3, previewUrl: '/templates/magnolia-organica/fundo.png' },
   ]
 
   for (const t of templates) {
-    const data = { ...t, demoData: DEMO_DATA }
     await prisma.invitationTemplate.upsert({
-      where: { slug: t.slug } as any,
-      update: data as any,
-      create: data as any,
+      where: { slug: t.slug },
+      update: t as any,
+      create: t as any,
     })
   }
 
@@ -38,11 +40,7 @@ async function main() {
   const existingConfig = await prisma.systemConfig.findFirst()
   if (!existingConfig) {
     await prisma.systemConfig.create({
-      data: {
-        invitationFeeCents: 5000,
-        bimExchangeRate: 64,
-        netshopEnabled: true
-      }
+      data: { invitationFeeCents: 5000, bimExchangeRate: 64, netshopEnabled: true },
     })
   }
 
