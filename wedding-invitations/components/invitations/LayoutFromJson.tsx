@@ -84,40 +84,50 @@ export function LayoutFromJson({
           transformOrigin: "top left",
         }}
       >
-        {Object.entries(layoutJson).map(([key, f]) => (
-          <div
-            key={key}
-            className={`flex items-center justify-center ${fontFamilyClass(f.fontFamily)}`}
-            style={{
-              position: "absolute",
-              left: f.x,
-              top: f.y,
-              width: f.width,
-              height: f.height,
-              fontSize: f.fontSize,
-              fontWeight: f.fontWeight ?? 400,
-              fontStyle: f.fontStyle ?? "normal",
-              color: f.color,
-              textAlign: f.textAlign,
-              textTransform: f.textTransform ?? "none",
-              letterSpacing: f.letterSpacing != null ? `${f.letterSpacing}px` : undefined,
-              lineHeight: f.lineHeight ?? 1.1,
-              overflow: "hidden",
-            }}
-          >
-            {isPhotoField(key, f) && (() => {
-              const url = getFieldValueWithSource(key, f, data);
-              if (!url) return null;
-              // eslint-disable-next-line @next/next/no-img-element
-              return <img src={url} alt="Foto do convite" className="h-full w-full object-cover" />;
-            })()}
-            {isPhotoField(key, f) ? null : isGuestName(key, f) ? (
-              <GuestNameRender mode={mode} value={getFieldValueWithSource(key, f, data)} />
-            ) : (
-              getFieldValueWithSource(key, f, data)
-            )}
-          </div>
-        ))}
+        {Object.entries(layoutJson).map(([key, f]) => {
+          const justifyClass =
+            f.textAlign === "left"
+              ? "justify-start text-left"
+              : f.textAlign === "right"
+              ? "justify-end text-right"
+              : "justify-center text-center";
+
+          return (
+            <div
+              key={key}
+              className={`flex items-center ${justifyClass} ${fontFamilyClass(f.fontFamily)}`}
+              style={{
+                position: "absolute",
+                left: f.x,
+                top: f.y,
+                width: f.width,
+                height: f.height,
+                fontSize: f.fontSize,
+                fontWeight: f.fontWeight ?? 400,
+                fontStyle: f.fontStyle ?? "normal",
+                color: f.color,
+                textAlign: f.textAlign,
+                textTransform: f.textTransform ?? "none",
+                letterSpacing: f.letterSpacing != null ? `${f.letterSpacing}px` : undefined,
+                lineHeight: f.lineHeight ?? 1.1,
+                overflow: "hidden",
+                wordBreak: "break-word",
+              }}
+            >
+              {isPhotoField(key, f) && (() => {
+                const url = getFieldValueWithSource(key, f, data);
+                if (!url) return null;
+                // eslint-disable-next-line @next/next/no-img-element
+                return <img src={url} alt="Foto do convite" className="h-full w-full object-cover" />;
+              })()}
+              {isPhotoField(key, f) ? null : isGuestName(key, f) ? (
+                <GuestNameRender mode={mode} value={getFieldValueWithSource(key, f, data)} />
+              ) : (
+                getFieldValueWithSource(key, f, data)
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

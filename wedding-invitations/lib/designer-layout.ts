@@ -354,6 +354,10 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre";
     case "rsvpContact":
       return data.rsvpDate ? `${data.rsvpContact ?? ""} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "");
+    case "photoLeft":
+      return data.photoLeft ?? "";
+    case "photoRight":
+      return data.photoRight ?? "";
     default:
       return `${fieldLabel(realKey)}`;
   }
