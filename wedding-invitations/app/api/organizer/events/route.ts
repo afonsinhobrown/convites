@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const ceremonyAddress = String(body?.ceremonyAddress ?? "").trim();
     const rsvpContact = String(body?.rsvpContact ?? "").trim();
     const welcomeMessage = String(body?.welcomeMessage ?? "").trim();
-    const templateSlug = String(body?.templateSlug ?? "magnolia-gold").trim();
+    const templateSlug = String(body?.templateSlug ?? "magnolia-casal").trim();
 
     if (!brideName || !groomName) {
       return NextResponse.json({ error: "Os nomes dos noivos são obrigatórios" }, { status: 400 });

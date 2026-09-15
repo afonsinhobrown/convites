@@ -2,7 +2,6 @@ import type { ComponentType } from "react";
 import type { InvitationData, InvitationMode } from "./types";
 import type { LayoutJson } from "@/lib/designer-layout";
 import { LayoutFromJson } from "./LayoutFromJson";
-import { MagnoliaGoldLayout } from "./layouts/MagnoliaGoldLayout";
 import { MagnoliaClassicaLayout } from "./layouts/MagnoliaClassicaLayout";
 import { MagnoliaCasalLayout } from "./layouts/MagnoliaCasalLayout";
 import { MagnoliaOrganicaLayout } from "./layouts/MagnoliaOrganicaLayout";
@@ -11,11 +10,9 @@ import { BasicLayout } from "./layouts/BasicLayout";
 type LayoutProps = { data: InvitationData; mode: InvitationMode };
 
 const LAYOUTS: Record<string, ComponentType<LayoutProps>> = {
-  MagnoliaGoldLayout,
   MagnoliaClassicaLayout,
   MagnoliaCasalLayout,
   MagnoliaOrganicaLayout,
-  "magnolia-gold": MagnoliaGoldLayout,
   "magnolia-classica": MagnoliaClassicaLayout,
   "magnolia-casal": MagnoliaCasalLayout,
   "magnolia-organica": MagnoliaOrganicaLayout,

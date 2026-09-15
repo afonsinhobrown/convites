@@ -9,16 +9,9 @@ interface Palette {
 }
 
 const PALETTES: Record<string, Palette> = {
-  "magnolia-gold": { bg: "#FDFBF7", border: "#C5A059", accent: "#8B5A2B", text: "#1A1A1A", deco: "heart" },
-  "classic-centered": { bg: "#FFFFFF", border: "#CBD5E1", accent: "#334155", text: "#0F172A", deco: "line" },
-  "photo-fullscreen": { bg: "#0B1220", border: "#3B82F6", accent: "#93C5FD", text: "#F9FAFB", deco: "arch" },
-  "minimal-banner": { bg: "#FAFAFA", border: "#E5E5E5", accent: "#737373", text: "#171717", deco: "line" },
-  "vintage-floral": { bg: "#FBF7F2", border: "#A47053", accent: "#9C6B4F", text: "#3F2A1D", deco: "diamond" },
-  "modern-dark": { bg: "#111827", border: "#F59E0B", accent: "#FBBF24", text: "#F3F4F6", deco: "line" },
-  "elegant-serif": { bg: "#FDFDFD", border: "#1F2937", accent: "#374151", text: "#111827", deco: "line" },
-  "boho-chic": { bg: "#F7F0E8", border: "#C77B54", accent: "#B05B34", text: "#4A2B22", deco: "rings" },
-  "royal-blue": { bg: "#EEEBFF", border: "#4F46E5", accent: "#4338CA", text: "#1E1B4B", deco: "diamond" },
-  "geometric-rose": { bg: "#FDF2F8", border: "#EC4899", accent: "#BE185D", text: "#500724", deco: "heart" },
+  "magnolia-classica": { bg: "#FDFBF7", border: "#C5A059", accent: "#8B5A2B", text: "#1A1A1A", deco: "heart" },
+  "magnolia-casal": { bg: "#FDFBF7", border: "#C5A059", accent: "#8B5A2B", text: "#1A1A1A", deco: "rings" },
+  "magnolia-organica": { bg: "#FDFBF7", border: "#C5A059", accent: "#8B5A2B", text: "#1A1A1A", deco: "diamond" },
 };
 
 export function TemplateThumbnail({
@@ -44,7 +37,7 @@ export function TemplateThumbnail({
     );
   }
 
-  const palette = PALETTES[slug] ?? PALETTES["classic-centered"];
+  const palette = PALETTES[slug] ?? PALETTES["magnolia-classica"];
 
   return (
     <svg
