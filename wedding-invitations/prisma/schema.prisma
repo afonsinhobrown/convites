@@ -36,6 +36,10 @@ model Event {
   receptionVenue    String?
   receptionTime     String?
 
+  // Fotos do casal (upload pelo organizador)
+  photoLeft         String?
+  photoRight        String?
+
   // Mensagem e RSVP
   welcomeMessage    String?   @db.Text
   rsvpDeadline      DateTime?
@@ -186,14 +190,33 @@ model InvitationTemplate {
   active        Boolean   @default(true)
   sortOrder     Int       @default(0)
 
-  editedById    String?
-  editedBy      Designer? @relation(fields: [editedById], references: [id])
-  editedAt      DateTime?
+  editedById     String?
+  editedBy       Designer? @relation(fields: [editedById], references: [id])
+  editedAt       DateTime?
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  parentId      String?
+  parent        InvitationTemplate? @relation("TemplateParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children      InvitationTemplate[] @relation("TemplateParent")
 
   @@index([editedById])
+  @@index([parentId])
+}
+
+model Asset {
+  id         String   @id @default(uuid())
+  slug       String   @unique
+  name       String
+  category   String
+  fileUrl    String
+  sortOrder  Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([category])
 }
 
 model SystemConfig {

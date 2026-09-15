@@ -69,6 +69,8 @@ export function eventToInvitationData(event: Event): InvitationData {
     rsvpContact: event.rsvpContact,
     rsvpDate: event.rsvpDeadline ? formatRsvpDate(event.rsvpDeadline) : undefined,
     welcomeMessage: event.welcomeMessage ?? undefined,
+    photoLeft: event.photoLeft ?? undefined,
+    photoRight: event.photoRight ?? undefined,
   };
 }
 

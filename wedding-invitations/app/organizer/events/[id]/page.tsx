@@ -6,6 +6,7 @@ import { formatEventDate, getBaseUrl, eventToInvitationData } from "@/lib/invita
 import { ArrowLeft } from "lucide-react";
 import { TemplatePicker } from "./TemplatePicker";
 import { GuestForm } from "./GuestForm";
+import { CouplePhotos } from "./CouplePhotos";
 import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +70,17 @@ export default async function EditEventPage({ params }: { params: { id: string }
         <section>
           <h2 className="mb-3 text-lg font-semibold text-gray-900">Escolher modelo</h2>
           <TemplatePicker eventId={event.id} currentSlug={event.templateSlug} templates={templates} />
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">Fotos do casal</h2>
+          <CouplePhotos
+            eventId={event.id}
+            bridesName={event.brideName}
+            groomsName={event.groomName}
+            initialLeft={event.photoLeft ?? null}
+            initialRight={event.photoRight ?? null}
+          />
         </section>
 
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.4fr]">

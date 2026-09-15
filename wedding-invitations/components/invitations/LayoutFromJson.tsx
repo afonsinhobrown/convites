@@ -12,6 +12,9 @@ import type { InvitationData, InvitationMode } from "./types";
 const isGuestName = (key: string, field?: { sourceKey?: string }) =>
   (field?.sourceKey ?? key) === "guestName";
 
+const isPhotoField = (key: string, field?: { sourceKey?: string }) =>
+  (field?.sourceKey ?? key) === "photoLeft" || (field?.sourceKey ?? key) === "photoRight";
+
 function GuestNameRender({
   mode,
   value,
@@ -102,7 +105,13 @@ export function LayoutFromJson({
               overflow: "hidden",
             }}
           >
-            {isGuestName(key, f) ? (
+            {isPhotoField(key, f) && (() => {
+              const url = getFieldValueWithSource(key, f, data);
+              if (!url) return null;
+              // eslint-disable-next-line @next/next/no-img-element
+              return <img src={url} alt="Foto do convite" className="h-full w-full object-cover" />;
+            })()}
+            {isPhotoField(key, f) ? null : isGuestName(key, f) ? (
               <GuestNameRender mode={mode} value={getFieldValueWithSource(key, f, data)} />
             ) : (
               getFieldValueWithSource(key, f, data)

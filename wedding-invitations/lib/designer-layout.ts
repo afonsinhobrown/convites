@@ -40,6 +40,8 @@ export const FIELD_ORDER = {
   invitationFooter: "Rodapé",
   invitationValues: "Valores",
   rsvpContact: "Contacto RSVP",
+  photoLeft: "Foto da noiva",
+  photoRight: "Foto do noivo",
 };
 
 export const FONT_FAMILIES = [

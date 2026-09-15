@@ -19,4 +19,6 @@ export interface InvitationData {
   invitationHonor?: string;
   invitationFooter?: string;
   invitationValues?: string;
+  photoLeft?: string;
+  photoRight?: string;
 }
