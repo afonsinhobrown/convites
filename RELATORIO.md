@@ -75,6 +75,7 @@ Ficheiros principais: `prisma/schema.prisma`, `prisma/seed.ts`, `lib/designer-la
 
 1. **Limpeza de repo:** o `git add -A` incluiu o zip de origem do Pngtree (`--Pngtree--...zip` + `.psd`) e a pasta `ASSETS\TEMPLATES` na raiz. Não é segredo, mas é ruído — proposta: `.gitignore` + `git rm --cached` + 1 commit de limpeza. **Aguardando confirmação do utilizador.**
 2. **Coordenadas de partida** das 2 fotos no caixilho do modelo Dourada Casal: precisam de **ver o `fundo.png`** (limitação do modelo — não consegui ver a imagem) para pré-posicionar; hoje o designer arrasta os campos-foto para o caixilho manualmente.
+3. **`next build` → OOM do worker (exit 134)** nesta máquina Windows — os workers de build do Next rebentam por memória, **pré-existente** e independente das edições (o bloco anterior só passou build com ajustes de memória). `tsc --noEmit` mantém-se verde (0 erros). A validar numa máquina com mais RAM ou com `next build --experimental-build-mode compile`.
 
 ---
 
