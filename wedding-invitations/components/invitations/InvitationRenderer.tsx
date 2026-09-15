@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { InvitationData, InvitationMode } from "./types";
-import type { LayoutJson } from "@/lib/designer-layout";
+import { DEFAULT_LAYOUTS, type LayoutJson } from "@/lib/designer-layout";
 import { LayoutFromJson } from "./LayoutFromJson";
 import { MagnoliaClassicaLayout } from "./layouts/MagnoliaClassicaLayout";
 import { MagnoliaCasalLayout } from "./layouts/MagnoliaCasalLayout";
@@ -31,16 +31,24 @@ export function InvitationRenderer({
   previewUrl?: string | null;
   mode?: InvitationMode;
 }) {
-  if (layoutJson && Object.keys(layoutJson).length > 0) {
+  // 1. PRIORIDADE MÁXIMA: layoutJson publicado/editado pelo designer no template
+  const activeLayoutJson =
+    (layoutJson && Object.keys(layoutJson).length > 0)
+      ? layoutJson
+      : DEFAULT_LAYOUTS[layout] ?? null;
+
+  if (activeLayoutJson && Object.keys(activeLayoutJson).length > 0) {
     return (
       <LayoutFromJson
-        layoutJson={layoutJson}
+        layoutJson={activeLayoutJson}
         previewUrl={previewUrl}
         data={data}
         mode={mode}
       />
     );
   }
+
+  // Fallback para layouts legados hardcoded se não houver JSON
   const Layout = LAYOUTS[layout] ?? BasicLayout;
   return <Layout data={data} mode={mode} />;
 }

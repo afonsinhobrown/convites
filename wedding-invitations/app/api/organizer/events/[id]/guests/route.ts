@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
 import { generateSecureToken, generateQrToken, getBaseUrl } from "@/lib/invitation";
+import { normalizeMozPhone } from "@/lib/phone";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,7 +30,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
       for (const item of body.guests) {
         const n = String(item?.name ?? "").trim();
         if (!n) continue;
-        const p = String(item?.phone ?? "").trim() || null;
+        const pRaw = String(item?.phone ?? "").trim() || null;
+        const p = pRaw ? normalizeMozPhone(pRaw) || pRaw : null;
         const em = String(item?.email ?? "").trim().toLowerCase() || null;
         const mc = Number.isFinite(Number(item?.maxCompanions))
           ? Math.max(0, Math.floor(Number(item?.maxCompanions)))
@@ -64,7 +66,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     // Inserção individual clássica
     const name = String(body?.name ?? "").trim();
-    const phone = String(body?.phone ?? "").trim() || null;
+    const phoneRaw = String(body?.phone ?? "").trim() || null;
+    const phone = phoneRaw ? normalizeMozPhone(phoneRaw) || phoneRaw : null;
     const email = String(body?.email ?? "").trim().toLowerCase() || null;
     const maxCompanions = Number.isFinite(Number(body?.maxCompanions))
       ? Math.max(0, Math.floor(Number(body?.maxCompanions)))

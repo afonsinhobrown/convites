@@ -9,6 +9,8 @@ import { InvitationRenderer } from "@/components/invitations/InvitationRenderer"
 import { RsvpForm } from "./RsvpForm";
 import { Heart } from "lucide-react";
 
+import { InvitationActions } from "@/components/invitations/InvitationActions";
+
 export const dynamic = "force-dynamic";
 
 export default async function InvitePage({ params }: { params: { secureToken: string } }) {
@@ -36,6 +38,7 @@ export default async function InvitePage({ params }: { params: { secureToken: st
   return (
     <main className="min-h-screen bg-[#FDFBF7]">
       <div className="mx-auto max-w-md px-4 py-8">
+        {/* Renderização do convite usando o layoutJson publicado pelo designer */}
         <InvitationRenderer
           layout={layoutName}
           data={data}
@@ -43,6 +46,7 @@ export default async function InvitePage({ params }: { params: { secureToken: st
           previewUrl={template?.previewUrl}
         />
 
+        {/* Secção de RSVP */}
         <div className="mt-8">
           {guest.rsvpStatus === "PENDING" && (
             <RsvpForm secureToken={guest.secureToken} initialGuestsCount={guest.guestsCount || 1} />
@@ -81,6 +85,14 @@ export default async function InvitePage({ params }: { params: { secureToken: st
             </div>
           )}
         </div>
+
+        {/* Secção complementar fixa: Localização Google Maps, Presentes (M-Pesa, e-Mola, IBAN), Mensagem aos noivos */}
+        <InvitationActions
+          eventId={guest.event.id}
+          guestName={guest.name}
+          venueName={guest.event.ceremonyVenue}
+          address={guest.event.ceremonyAddress}
+        />
 
         <div className="mt-8 text-center">
           <Link

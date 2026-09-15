@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
 
+import { normalizeMozPhone } from "@/lib/phone";
+
 export async function POST(request: Request) {
   try {
     const organizerId = await getCurrentOrganizerId();
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
     const ceremonyTime = String(body?.ceremonyTime ?? "").trim();
     const ceremonyVenue = String(body?.ceremonyVenue ?? "").trim();
     const ceremonyAddress = String(body?.ceremonyAddress ?? "").trim();
-    const rsvpContact = String(body?.rsvpContact ?? "").trim();
+    const rsvpContactRaw = String(body?.rsvpContact ?? "").trim();
     const welcomeMessage = String(body?.welcomeMessage ?? "").trim();
     const templateSlug = String(body?.templateSlug ?? "magnolia-casal").trim();
 
@@ -29,9 +31,11 @@ export async function POST(request: Request) {
     if (!ceremonyTime || !ceremonyVenue) {
       return NextResponse.json({ error: "Hora e local são obrigatórios" }, { status: 400 });
     }
-    if (!rsvpContact) {
+    if (!rsvpContactRaw) {
       return NextResponse.json({ error: "O contacto RSVP é obrigatório" }, { status: 400 });
     }
+
+    const rsvpContact = normalizeMozPhone(rsvpContactRaw) || rsvpContactRaw;
 
     const weddingDate = new Date(`${weddingDateRaw}T12:00:00`);
 

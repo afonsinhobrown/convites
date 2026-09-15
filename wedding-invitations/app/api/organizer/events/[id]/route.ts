@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
+import { normalizeMozPhone } from "@/lib/phone";
 
 const ALLOWED_FIELDS = [
   "brideName",
@@ -51,6 +52,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
     if (data.rsvpDeadline != null && typeof data.rsvpDeadline === "string") {
       data.rsvpDeadline = new Date(`${data.rsvpDeadline}T12:00:00`);
+    }
+    if (typeof data.rsvpContact === "string" && data.rsvpContact.trim()) {
+      data.rsvpContact = normalizeMozPhone(data.rsvpContact.trim()) || data.rsvpContact.trim();
     }
     if (typeof data.welcomeMessage === "string") {
       data.welcomeMessage = data.welcomeMessage.trim() === "" ? null : data.welcomeMessage;
