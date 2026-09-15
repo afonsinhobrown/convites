@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Link2, Sparkles, FileDown, Download, Printer, Users } from "lucide-react";
+import { X, Link2, Sparkles, FileDown, Download, Printer, Users, Trash2 } from "lucide-react";
 import { InvitationRenderer } from "@/components/invitations/InvitationRenderer";
 import type { InvitationData } from "@/components/invitations/types";
 
@@ -186,12 +186,40 @@ export function InvitesPanel({
                     {g.rsvpStatus === "CONFIRMED" ? ` · ${g.guestsCount} pessoa(s)` : ""}
                   </span>
                 </div>
-                {url ? (
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-[#C5A059] hover:underline">
-                    <Link2 className="h-3.5 w-3.5" />
-                    Abrir convite
-                  </a>
-                ) : null}
+                <div className="flex items-center gap-3">
+                  {url ? (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-[#C5A059] hover:underline"
+                    >
+                      <Link2 className="h-3.5 w-3.5" />
+                      Abrir convite
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!confirm(`Remover o convidado "${g.name}"?`)) return;
+                      try {
+                        const res = await fetch(`/api/organizer/events/${eventId}/guests/${g.id}`, {
+                          method: "DELETE",
+                        });
+                        if (res.ok) {
+                          setGuests((prev) => prev.filter((item) => item.id !== g.id));
+                          router.refresh();
+                        }
+                      } catch (err) {
+                        console.error("Erro ao remover:", err);
+                      }
+                    }}
+                    className="p-1 text-gray-400 hover:text-red-600 transition"
+                    title="Remover convidado"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </li>
             );
           })}
