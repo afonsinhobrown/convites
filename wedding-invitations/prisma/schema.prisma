@@ -51,8 +51,8 @@ model Event {
   templatePaidAt     DateTime?
   templatePaymentRef String?
 
-  // Taxa por convidado
-  guestFeeCents      Int       @default(5000)
+  // Taxa por convidado (25 MT = 2500 centavos)
+  guestFeeCents      Int       @default(2500)
   guestFeePaidAt     DateTime?
   guestFeePaymentRef String?
 
@@ -230,7 +230,7 @@ model Asset {
 
 model SystemConfig {
   id                 String   @id @default(uuid())
-  invitationFeeCents Int      @default(5000) // taxa por convidado
+  invitationFeeCents Int      @default(2500) // taxa por convidado: 25 MT
   bimExchangeRate    Int      @default(64) // MT/USD
   netshopEnabled     Boolean  @default(true)
   updatedAt          DateTime @updatedAt

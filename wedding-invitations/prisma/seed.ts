@@ -68,7 +68,12 @@ async function main() {
   const existingConfig = await prisma.systemConfig.findFirst()
   if (!existingConfig) {
     await prisma.systemConfig.create({
-      data: { invitationFeeCents: 5000, bimExchangeRate: 64, netshopEnabled: true },
+      data: { invitationFeeCents: 2500, bimExchangeRate: 64, netshopEnabled: true },
+    })
+  } else {
+    await prisma.systemConfig.update({
+      where: { id: existingConfig.id },
+      data: { invitationFeeCents: 2500 },
     })
   }
 
