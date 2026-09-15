@@ -1,22 +1,36 @@
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getSystemConfig } from "@/lib/config";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
-import { Heart, Palette } from "lucide-react";
+import { Watermark } from "@/components/Watermark";
+import { Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "Convites de Casamento — DoReMi Eventos",
+  description: "Convites digitais personalizados com RSVP, QR Code e confirmação de presença. Escolha o seu modelo.",
+};
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#FDFBF7]">
+      {/* Header com logo DoReMi */}
       <header className="border-b border-[#C5A059]/30 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-2">
-            <Heart className="h-5 w-5 fill-[#C5A059] text-[#C5A059]" />
-            <span className="text-lg font-serif-custom font-bold text-[#1A1A1A]">
-              Convites de Casamento
-            </span>
-          </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/doremi-logo.jpg"
+              alt="DoReMi Eventos"
+              width={140}
+              height={35}
+              className="h-9 w-auto object-contain"
+              priority
+            />
+          </Link>
+
           <nav className="flex items-center gap-3 text-sm">
             <Link
               href="/designer/login"
@@ -69,32 +83,36 @@ async function Gallery() {
   ]);
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {templates.map((t) => {
-        const usd = (t.priceUsdCents / 100).toFixed(2);
         const mzn = Math.round((t.priceUsdCents / 100) * config.bimExchangeRate);
         return (
           <Link
             key={t.id}
-            href={`/organizer/auth?template=${t.slug}`}
-            className="group rounded-2xl border border-[#C5A059]/20 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            href={`/templates/${t.slug}`}
+            className="group rounded-2xl border border-[#C5A059]/20 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            <TemplatePreview
-              slug={t.slug}
-              name={t.name}
-              componentName={t.componentName}
-              previewUrl={t.previewUrl}
-              layoutJson={t.layoutJson}
-              demoData={t.demoData}
-              className="aspect-[2/3]"
-            />
+            {/* Preview com marca de água */}
+            <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "2/3" }}>
+              <TemplatePreview
+                slug={t.slug}
+                name={t.name}
+                componentName={t.componentName}
+                previewUrl={t.previewUrl}
+                layoutJson={t.layoutJson}
+                demoData={t.demoData}
+                className="h-full w-full"
+              />
+              <Watermark />
+            </div>
+
             <div className="mt-3">
               <h2 className="text-sm font-semibold text-gray-900">{t.name}</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                US$ {usd} · ≈ {mzn} MT
+              <p className="mt-1 text-sm font-medium text-[#C5A059]">
+                {mzn.toLocaleString("pt-PT")} MT
               </p>
-              <p className="mt-1 text-xs font-medium text-[#C5A059] group-hover:underline">
-                Começar convite →
+              <p className="mt-1 text-xs font-medium text-gray-400 group-hover:text-[#C5A059] transition">
+                Ver modelo →
               </p>
             </div>
           </Link>
