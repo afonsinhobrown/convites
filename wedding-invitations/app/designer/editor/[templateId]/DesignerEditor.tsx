@@ -173,7 +173,12 @@ return (
     <main className="flex h-screen flex-col bg-gray-100">
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
         <div>
-
+          <a
+            href="/designer"
+            className="mb-1 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-rose-600"
+          >
+            ← Todos os templates
+          </a>
           <h1 className="text-lg font-semibold text-gray-900">{template.name}</h1>
           <p className="text-xs text-gray-500">slug: {template.slug}</p>
           <div className="mt-1 flex items-center gap-2">
