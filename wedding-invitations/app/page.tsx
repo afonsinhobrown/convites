@@ -76,7 +76,7 @@ async function Gallery() {
         return (
           <Link
             key={t.id}
-            href="/organizer/register"
+            href={`/organizer/auth?template=${t.slug}`}
             className="group rounded-2xl border border-[#C5A059]/20 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <TemplatePreview
