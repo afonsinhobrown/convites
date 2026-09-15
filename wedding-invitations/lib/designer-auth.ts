@@ -17,10 +17,17 @@ function base64UrlToBytes(value: string): Uint8Array {
   return bytes;
 }
 
+const SESSION_COOKIE_SECRET = process.env.DESIGNER_COOKIE_SECRET;
+if (!SESSION_COOKIE_SECRET) {
+  throw new Error(
+    "DESIGNER_COOKIE_SECRET não está definida no ambiente — cria-a na Vercel (Settings → Environment Variables) com o mesmo valor do .env local."
+  );
+}
+
 async function hmacSign(data: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    enc.encode(process.env.DESIGNER_COOKIE_SECRET ?? ""),
+    enc.encode(SESSION_COOKIE_SECRET),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
