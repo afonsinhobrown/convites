@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { RegisterForm } from "./RegisterForm";
 
@@ -11,7 +12,9 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-serif-custom font-bold text-[#1A1A1A]">Criar conta</h1>
           <p className="mt-1 text-sm text-gray-500">Comece a criar o seu convite de casamento</p>
         </div>
-        <RegisterForm />
+        <Suspense fallback={null}>
+          <RegisterForm />
+        </Suspense>
         <p className="mt-4 text-center text-sm text-gray-600">
           Já tem conta?{" "}
           <Link href="/organizer/login" className="font-medium text-[#C5A059] hover:underline">

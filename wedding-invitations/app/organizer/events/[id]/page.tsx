@@ -8,6 +8,7 @@ import { TemplatePicker } from "./TemplatePicker";
 import { GuestForm } from "./GuestForm";
 import { CouplePhotos } from "./CouplePhotos";
 import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
+import { EventDetailsEditor } from "./EventDetailsEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,10 @@ export default async function EditEventPage({ params }: { params: { id: string }
   if (!event) notFound();
 
   const { day, month, year } = formatEventDate(event.weddingDate);
+
+  // Formato YYYY-MM-DD para o input type="date"
+  const d = new Date(event.weddingDate);
+  const weddingDateRaw = d.toISOString().split("T")[0];
 
   const baseUrl = getBaseUrl();
   const inviteGuests: InviteGuest[] = guests.map((g) => ({
@@ -62,6 +67,21 @@ export default async function EditEventPage({ params }: { params: { id: string }
             <p className="text-sm text-gray-500">
               {day} de {month.toLowerCase()} de {year} · {event.ceremonyTime} · {event.ceremonyVenue}
             </p>
+          </div>
+          <div>
+            <EventDetailsEditor
+              eventId={event.id}
+              initialData={{
+                brideName: event.brideName,
+                groomName: event.groomName,
+                weddingDateRaw,
+                ceremonyTime: event.ceremonyTime,
+                ceremonyVenue: event.ceremonyVenue,
+                ceremonyAddress: event.ceremonyAddress,
+                rsvpContact: event.rsvpContact,
+                welcomeMessage: event.welcomeMessage ?? "",
+              }}
+            />
           </div>
         </div>
       </header>

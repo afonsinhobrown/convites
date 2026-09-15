@@ -28,7 +28,14 @@ export function LoginForm() {
         return;
       }
       const from = searchParams.get("from");
-      router.push(from?.startsWith("/organizer") ? from : "/organizer");
+      const template = searchParams.get("template");
+      if (template) {
+        router.push(`/organizer/events/new?template=${encodeURIComponent(template)}`);
+      } else if (from?.startsWith("/organizer")) {
+        router.push(from);
+      } else {
+        router.push("/organizer");
+      }
       router.refresh();
     } catch {
       setError("Erro de ligação ao servidor. Tente novamente.");

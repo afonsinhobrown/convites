@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +34,12 @@ export function RegisterForm() {
         setError(data.error ?? "Erro ao criar conta");
         return;
       }
-      router.push("/organizer");
+      const template = searchParams.get("template");
+      if (template) {
+        router.push(`/organizer/events/new?template=${encodeURIComponent(template)}`);
+      } else {
+        router.push("/organizer");
+      }
       router.refresh();
     } catch {
       setError("Erro de ligação ao servidor. Tente novamente.");

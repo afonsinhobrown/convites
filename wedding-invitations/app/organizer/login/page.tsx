@@ -17,7 +17,10 @@ export default function LoginPage() {
         </Suspense>
         <p className="mt-4 text-center text-sm text-gray-600">
           Ainda não tem conta?{" "}
-          <Link href="/organizer/register" className="font-medium text-[#C5A059] hover:underline">
+          <Link
+            href="/organizer/register"
+            className="font-medium text-[#C5A059] hover:underline"
+          >
             Criar conta
           </Link>
         </p>
