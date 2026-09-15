@@ -31,12 +31,10 @@ function TemplateCard({
   template,
   onStatusChange,
   onDelete,
-  onDuplicated,
 }: {
   template: InvitationTemplate;
   onStatusChange: (slug: string, next: Status) => void;
   onDelete: (slug: string) => void;
-  onDuplicated: (t: InvitationTemplate) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const status = template.status as Status;
@@ -268,7 +266,6 @@ export function DesignerDashboard({
                     template={t}
                     onStatusChange={handleStatusChange}
                     onDelete={handleDelete}
-                    onDuplicated={() => window.location.reload()}
                   />
                 ))}
               </div>
