@@ -38,6 +38,8 @@ const SAMPLE_DATA = {
   ano1: "27",
   hora1: "14h00",
   data_completa: "08/09/2027",
+  data_setembro: "Sábado, 26 de Setembro de 2026",
+  data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
   venue: "Mesquita Al-Iman",
   address: "RUA DA BEIRA, MAPUTO",
   locationName: "Mesquita Al-Iman",

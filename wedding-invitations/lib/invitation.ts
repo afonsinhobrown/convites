@@ -33,6 +33,16 @@ const MONTHS_PT_LABEL = [
   "Dezembro",
 ];
 
+const WEEKDAYS_PT = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+];
+
 export function generateSecureToken(): string {
   return randomBytes(24).toString("hex");
 }
@@ -60,6 +70,8 @@ export function eventToInvitationData(event: Event): InvitationData {
   const day = String(d.getDate()).padStart(2, "0");
   const month = MONTHS_PT[d.getMonth()] ?? d.toLocaleDateString("pt-PT", { month: "long" }).toUpperCase();
   const year = String(d.getFullYear());
+  const weekday = WEEKDAYS_PT[d.getDay()] ?? "Sábado";
+  const monthLabel = MONTHS_PT_LABEL[d.getMonth()] ?? "Setembro";
 
   return {
     brideName: event.brideName ?? "",
@@ -79,6 +91,8 @@ export function eventToInvitationData(event: Event): InvitationData {
     ano1: String(d.getFullYear()).slice(-2) || "27",
     hora1: event.ceremonyTime ? (event.ceremonyTime.includes("h") ? event.ceremonyTime : event.ceremonyTime.replace(":", "h")) : "14h00",
     data_completa: `${day}/${String(d.getMonth() + 1).padStart(2, "0")}/${year}`,
+    data_setembro: `${weekday}, ${d.getDate()} de ${monthLabel} de ${year}`,
+    data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
     locationName: event.ceremonyVenue ?? "",
     locationAddress: event.ceremonyAddress ?? "",
     venue: event.ceremonyVenue ?? "",

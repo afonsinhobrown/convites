@@ -44,6 +44,8 @@ export const FIELD_ORDER = {
   ano1: "Ano (27)",
   hora1: "Hora (14h00)",
   data_completa: "Data Completa (08/09/2027)",
+  data_setembro: "Data Extensa (Sábado, 26 de Setembro de 2026)",
+  data_islao: "Data Islâmica (14 de Rabīʿ al-Thānī de 1448 H)",
   invitationRomantic: "Frase romântica",
   locationName: "Nome do local",
   locationAddress: "Morada do local",
@@ -386,6 +388,10 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.hora1 || "14h00";
     case "data_completa":
       return data.data_completa || "08/09/2027";
+    case "data_setembro":
+      return data.data_setembro || "Sábado, 26 de Setembro de 2026";
+    case "data_islao":
+      return data.data_islao || "14 de Rabīʿ al-Thānī de 1448 H";
     case "locationName":
       return data.locationName ?? data.venue ?? "";
     case "locationAddress":
@@ -432,6 +438,8 @@ export type InvitationFieldData = {
   ano1?: string;
   hora1?: string;
   data_completa?: string;
+  data_setembro?: string;
+  data_islao?: string;
   venue: string;
   address: string;
   rsvpContact: string;
