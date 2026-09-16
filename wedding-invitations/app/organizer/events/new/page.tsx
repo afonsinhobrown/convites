@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
-import { demoDataToInvitationData, DEMO_DATA } from "@/lib/demo-data";
+import { extractTemplateDefaultData } from "@/lib/designer-layout";
 import { NewEventForm } from "./NewEventForm";
 import { ArrowLeft } from "lucide-react";
 
@@ -35,27 +35,8 @@ export default async function NewEventPage({
 
   const currentTemplate = templates.find((t) => t.slug === selectedSlug);
 
-  // Obter demoData do modelo ou DEMO_DATA global
-  const normalizedDemo =
-    demoDataToInvitationData(currentTemplate?.demoData) ?? DEMO_DATA;
-
-  // Formatar data inicial para o campo input type="date" (YYYY-MM-DD)
-  const defaultDate = "2026-10-24";
-  const defaultTime = normalizedDemo.time || "15:30";
-
-  const defaultValues = {
-    brideName: normalizedDemo.brideName || "Ana",
-    groomName: normalizedDemo.groomName || "Zlatan",
-    weddingDate: defaultDate,
-    ceremonyTime: defaultTime,
-    ceremonyVenue: normalizedDemo.venue || "Quinta dos Coqueiros",
-    ceremonyAddress: normalizedDemo.address || "Av. da Marginal, Maputo",
-    rsvpContact: normalizedDemo.rsvpContact || "+258 84 123 4567",
-    welcomeMessage:
-      normalizedDemo.welcomeMessage ||
-      normalizedDemo.invitationRomantic ||
-      "Duas vidas, dois corações, uma história para toda a vida.",
-  };
+  // Obter os dados configurados e publicados pelo designer para este modelo específico
+  const defaultValues = extractTemplateDefaultData(currentTemplate ?? { slug: selectedSlug });
 
   return (
     <main className="min-h-screen bg-[#FDFBF7]">

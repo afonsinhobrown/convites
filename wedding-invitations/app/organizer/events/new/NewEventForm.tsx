@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { Check, Sparkles, SlidersHorizontal } from "lucide-react";
-import { getTemplateActiveFields } from "@/lib/designer-layout";
+import { getTemplateActiveFields, extractTemplateDefaultData } from "@/lib/designer-layout";
 
 interface TemplateItem {
   id: string;
@@ -59,6 +59,15 @@ export function NewEventForm({
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function handleSelectTemplate(tpl: TemplateItem) {
+    setTemplateSlug(tpl.slug);
+    const tplData = extractTemplateDefaultData(tpl);
+    setForm((prev) => ({
+      ...prev,
+      ...tplData,
+    }));
   }
 
   const selectedTemplate =
@@ -125,7 +134,7 @@ export function NewEventForm({
               <button
                 key={tpl.id}
                 type="button"
-                onClick={() => setTemplateSlug(tpl.slug)}
+                onClick={() => handleSelectTemplate(tpl)}
                 className={`group relative flex flex-col overflow-hidden rounded-xl border-2 p-2 text-left transition-all ${
                   isSelected
                     ? "border-[#C5A059] bg-[#C5A059]/5 shadow-md"

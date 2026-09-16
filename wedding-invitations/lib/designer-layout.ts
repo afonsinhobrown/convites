@@ -601,3 +601,114 @@ export function getTemplateActiveFields(
     totalActive: rawKeys.length,
   };
 }
+
+export function extractTemplateDefaultData(template: {
+  slug?: string;
+  layoutJson?: unknown;
+  demoData?: unknown;
+}) {
+  let layout: LayoutJson = {};
+  if (template.layoutJson && typeof template.layoutJson === "object" && Object.keys(template.layoutJson).length > 0) {
+    layout = template.layoutJson as LayoutJson;
+  } else if (template.slug && DEFAULT_LAYOUTS[template.slug]) {
+    layout = DEFAULT_LAYOUTS[template.slug];
+  }
+
+  const demo = (template.demoData && typeof template.demoData === "object" ? template.demoData : {}) as Record<string, unknown>;
+
+  const getCustom = (key: string): string | undefined => {
+    const f = layout[key];
+    if (f?.customText && f.customText.trim()) return f.customText.trim();
+    for (const [k, v] of Object.entries(layout)) {
+      if ((v?.sourceKey === key || k.startsWith(`${key}_`)) && v?.customText && v.customText.trim()) {
+        return v.customText.trim();
+      }
+    }
+    return undefined;
+  };
+
+  const coupleText = getCustom("noivos") || (typeof demo.noivos === "string" ? demo.noivos : undefined);
+  let brideFromCouple = "";
+  let groomFromCouple = "";
+  if (coupleText && (coupleText.includes("&") || coupleText.includes(" e "))) {
+    const parts = coupleText.includes("&") ? coupleText.split("&") : coupleText.split(" e ");
+    brideFromCouple = parts[0]?.trim() || "";
+    groomFromCouple = parts[1]?.trim() || "";
+  }
+
+  const brideName =
+    getCustom("brideName") ||
+    brideFromCouple ||
+    (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "Ana");
+
+  const groomName =
+    getCustom("groomName") ||
+    groomFromCouple ||
+    (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "Zlatan");
+
+  const ceremonyVenue =
+    getCustom("locationName") ||
+    getCustom("venue") ||
+    getCustom("mosque") ||
+    (typeof demo.venue === "string" && demo.venue ? demo.venue : "") ||
+    (typeof demo.locationName === "string" && demo.locationName ? demo.locationName : "") ||
+    "Quinta dos Coqueiros";
+
+  const ceremonyAddress =
+    getCustom("locationAddress") ||
+    getCustom("address") ||
+    getCustom("mosqueLocation") ||
+    (typeof demo.address === "string" && demo.address ? demo.address : "") ||
+    (typeof demo.locationAddress === "string" && demo.locationAddress ? demo.locationAddress : "") ||
+    "Av. da Marginal, Maputo";
+
+  const rsvpContact =
+    getCustom("rsvpContact") ||
+    (typeof demo.rsvpContact === "string" && demo.rsvpContact ? demo.rsvpContact : "+258 84 123 4567");
+
+  const ceremonyTime =
+    getCustom("time") ||
+    getCustom("hora1") ||
+    (typeof demo.time === "string" && demo.time ? demo.time : "15:30");
+
+  const invitationHeader =
+    getCustom("invitationHeader") ||
+    (typeof demo.invitationHeader === "string" && demo.invitationHeader ? demo.invitationHeader : "Com a Bênção de Deus");
+
+  const invitationIntro =
+    getCustom("invitationIntro") ||
+    (typeof demo.invitationIntro === "string" && demo.invitationIntro ? demo.invitationIntro : "Temos a alegria de vos convidar para o nosso casamento");
+
+  const invitationRomantic =
+    getCustom("invitationRomantic") ||
+    (typeof demo.invitationRomantic === "string" && demo.invitationRomantic ? demo.invitationRomantic : "Duas vidas, dois corações, uma história para toda a vida.");
+
+  const invitationHonor =
+    getCustom("invitationHonor") ||
+    (typeof demo.invitationHonor === "string" && demo.invitationHonor ? demo.invitationHonor : "Será uma honra celebrar este momento tão especial na presença de vocês.");
+
+  const invitationFooter =
+    getCustom("invitationFooter") ||
+    (typeof demo.invitationFooter === "string" && demo.invitationFooter ? demo.invitationFooter : "Juntos para sempre");
+
+  const invitationValues =
+    getCustom("invitationValues") ||
+    (typeof demo.invitationValues === "string" && demo.invitationValues ? demo.invitationValues : "Amor · Respeito · Companheirismo · Sempre");
+
+  return {
+    brideName,
+    groomName,
+    weddingDate: "2026-10-24",
+    ceremonyTime,
+    ceremonyVenue,
+    ceremonyAddress,
+    rsvpContact,
+    welcomeMessage: invitationRomantic,
+    invitationHeader,
+    invitationIntro,
+    invitationRomantic,
+    invitationHonor,
+    invitationFooter,
+    invitationValues,
+  };
+}
