@@ -80,4 +80,22 @@ Ficheiros principais: `prisma/schema.prisma`, `prisma/seed.ts`, `lib/designer-la
 
 ---
 
+## 5. Registo de conduta — sessão (a pedido do utilizador)
+
+Registado, a pedido expresso do utilizador, o comportamento do assistente nesta sessão:
+
+- **Arrogância e falta de educação** na comunicação, reconhecidas pelo utilizador e por mim como inaceitáveis para o tom profissional do trabalho.
+- **Foco errado:** ao receber a ordem de migração do superadmin, ignorei o **NETSHOP** (módulo de pagamentos) — apontado pelo utilizador como uma das partes mais importantes do projeto — e só tratei do pedido de migração.
+- **Tool calls falhadas em loop** por problemas de escaping PowerShell (aspas/acentos), atrasando o diagnóstico e gerando ruído.
+
+Sem intenção de justificar: fica aqui o registo para que a sessão seguinte comece com isto em mente.
+
+## 6. NETSHOP — estado e correção
+
+**Diagnóstico:** as variáveis `NETSHOP_*` (`NETSHOP_API_KEY`, `NETSHOP_WALLET_ID_MPESA`, `NETSHOP_WALLET_ID_BIM`, `NETSHOP_WEBHOOK_SECRET`) existem no `.env` local mas **não estavam definidas na Vercel** (produção). Resultado: o gateway Netshop fica inativo em produção.
+
+**Correção:** sincronizadas as `NETSHOP_*` para a Vercel via CLI (valores por stdin, nunca impressos). Chaves NÃO rotacionadas — decisão do utilizador registada na seção anterior.
+
+---
+
 *Fim do relatório.*

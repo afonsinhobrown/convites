@@ -112,16 +112,30 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
     setSelected(newKey as FieldKey);
   }
 
-  function removeSelected() {
-    if (!(selected as string).includes("_cop")) return;
-    const key = selected as string;
+  function addField(key: FieldKey) {
+    if (layout[key as string]) return;
+    setLayout((prev) => ({
+      ...prev,
+      [key]: emptyField(key),
+    }));
+    setSelected(key);
+  }
+
+  function removeField(key: string) {
     setLayout((prev) => {
       const next = { ...prev };
       delete next[key];
       return next;
     });
     const remaining = orderedKeys(layout).filter((k) => k !== key);
-    setSelected(remaining[remaining.length - 1] ?? "brideName");
+    if (remaining.length > 0) {
+      setSelected(remaining[0]);
+    }
+  }
+
+  function removeSelected() {
+    if (!selected) return;
+    removeField(selected as string);
   }
 
   function resetLayout() {
@@ -248,24 +262,76 @@ return (
       <div className="flex flex-1 overflow-hidden">
         {/* Painel de propriedades */}
         <aside className="w-80 shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-700">Campos</h2>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-700">Campos Ativos ({orderedKeys(layout).length})</h2>
+          </div>
+
+          {/* Adicionar componente que não está no layout */}
+          {(() => {
+            const availableToAdd = (Object.keys(FIELD_ORDER) as FieldKey[]).filter((k) => !(k in layout));
+            if (availableToAdd.length === 0) return null;
+            return (
+              <div className="mb-3 rounded-lg border border-dashed border-gray-300 p-2 bg-gray-50">
+                <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                  + Adicionar componente ao convite:
+                </label>
+                <select
+                  className="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700"
+                  defaultValue=""
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      addField(e.target.value as FieldKey);
+                      e.target.value = "";
+                    }
+                  }}
+                >
+                  <option value="" disabled>
+                    Escolha um componente...
+                  </option>
+                  {availableToAdd.map((key) => (
+                    <option key={key} value={key}>
+                      {FIELD_ORDER[key]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          })()}
+
           <div className="mb-5 grid grid-cols-2 gap-1.5">
             {orderedKeys(layout).map((key) => {
               const copied = (key as string).includes("_cop");
               return (
-                <button
+                <div
                   key={key}
-                  onClick={() => setSelected(key)}
-                  className={`rounded-md px-2 py-1.5 text-left text-xs font-medium transition-colors ${
+                  className={`group relative flex items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                     selected === key
                       ? "bg-rose-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {FIELD_ORDER[key] ?? key}
-                  {copied ? <span className="opacity-70"> (cópia)</span> : null}
-                  {layout[key as string]?.locked ? " 🔒" : ""}
-                </button>
+                  <button
+                    onClick={() => setSelected(key)}
+                    className="flex-1 text-left truncate mr-1"
+                  >
+                    {FIELD_ORDER[key] ?? key}
+                    {copied ? <span className="opacity-70"> (cópia)</span> : null}
+                    {layout[key as string]?.locked ? " 🔒" : ""}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeField(key as string);
+                    }}
+                    className={`rounded px-1 text-[10px] opacity-60 hover:opacity-100 transition ${
+                      selected === key ? "hover:bg-rose-700 text-white" : "hover:bg-gray-300 text-red-600"
+                    }`}
+                    title={`Remover ${FIELD_ORDER[key] ?? key}`}
+                  >
+                    ✕
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -303,8 +369,7 @@ return (
               </button>
               <button
                 onClick={removeSelected}
-                disabled={!(selected as string).includes("_cop")}
-                className="flex-1 rounded-md border border-red-200 px-2 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex-1 rounded-md border border-red-200 px-2 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
               >
                 Remover
               </button>

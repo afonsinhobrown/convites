@@ -153,12 +153,13 @@ export function defaultFontFor(key: string): string {
 
 export function emptyField(key: string): LayoutField {
   const isName = key === "brideName" || key === "groomName";
+  const isPhoto = key === "photoLeft" || key === "photoRight";
   const family = defaultFontFor(key);
   return {
-    x: 320,
-    y: 100,
-    width: 400,
-    height: isName ? 160 : 60,
+    x: isPhoto ? (key === "photoLeft" ? 220 : 540) : 312,
+    y: isPhoto ? 450 : 200,
+    width: isPhoto ? 240 : 400,
+    height: isPhoto ? 320 : isName ? 160 : 60,
     fontSize: isName || key === "day" || key === "time" ? FX.name : FX.small,
     fontFamily: family,
     fontWeight: isName ? 700 : undefined,

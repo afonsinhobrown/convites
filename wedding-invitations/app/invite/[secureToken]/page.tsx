@@ -1,17 +1,80 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
-import { getBaseUrl } from "@/lib/invitation";
-import { eventToInvitationData } from "@/lib/invitation";
+import { getBaseUrl, formatEventDate, eventToInvitationData } from "@/lib/invitation";
 import { InvitationRenderer } from "@/components/invitations/InvitationRenderer";
 import { RsvpForm } from "./RsvpForm";
 import { Heart } from "lucide-react";
-
 import { InvitationActions } from "@/components/invitations/InvitationActions";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { secureToken: string };
+}): Promise<Metadata> {
+  const guest = await prisma.guest.findUnique({
+    where: { secureToken: params.secureToken },
+    include: { event: true },
+  });
+
+  if (!guest) {
+    return {
+      title: "Convite de Casamento — DoReMi Eventos",
+      description: "Convite digital personalizado de casamento.",
+    };
+  }
+
+  const { brideName, groomName, ceremonyVenue, ceremonyTime, weddingDate, templateSlug } = guest.event;
+  const { day, month, year } = formatEventDate(weddingDate);
+  const baseUrl = getBaseUrl();
+  const inviteUrl = `${baseUrl}/invite/${guest.secureToken}`;
+
+  const template = await prisma.invitationTemplate.findUnique({
+    where: { slug: templateSlug },
+    select: { previewUrl: true },
+  });
+
+  const previewImage = template?.previewUrl
+    ? template.previewUrl.startsWith("http")
+      ? template.previewUrl
+      : `${baseUrl}${template.previewUrl}`
+    : `${baseUrl}/templates/magnolia-classica/fundo.png`;
+
+  const title = `Convite de Casamento — ${brideName} & ${groomName}`;
+  const description = `Olá ${guest.name}! Temos a honra de vos convidar para o nosso casamento no dia ${day} de ${month.toLowerCase()} de ${year} (${ceremonyTime}) em ${ceremonyVenue}. Clique para abrir o convite e confirmar a sua presença.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: inviteUrl,
+      siteName: "DoReMi Eventos",
+      locale: "pt_MZ",
+      type: "article",
+      images: [
+        {
+          url: previewImage,
+          width: 1024,
+          height: 1536,
+          alt: `Convite de ${brideName} & ${groomName}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [previewImage],
+    },
+  };
+}
 
 export default async function InvitePage({ params }: { params: { secureToken: string } }) {
   const guest = await prisma.guest.findUnique({
