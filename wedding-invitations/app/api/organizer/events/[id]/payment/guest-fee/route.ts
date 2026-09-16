@@ -96,10 +96,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
     });
   } catch (error) {
     console.error("Erro ao iniciar pagamento da taxa de convidados na NetShop:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Erro ao processar pagamento" },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : "Erro ao processar pagamento";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
 

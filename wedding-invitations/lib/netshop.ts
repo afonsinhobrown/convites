@@ -43,13 +43,14 @@ export async function createNetShopCharge(params: {
     );
   }
 
-  // Normalizar número de telefone moçambicano
+  // Normalizar número de telefone moçambicano para MSISDN internacional (25884XXXXXXX / 25885XXXXXXX)
   let phone = params.msisdn ? params.msisdn.replace(/\D/g, "") : undefined;
   if (phone) {
     if (phone.startsWith("258") && phone.length === 12) {
-      phone = phone.substring(3);
-    }
-    if (phone.length !== 9 || !phone.startsWith("8")) {
+      // já está 25884XXXXXXX
+    } else if (phone.length === 9 && (phone.startsWith("84") || phone.startsWith("85") || phone.startsWith("8"))) {
+      phone = `258${phone}`;
+    } else {
       phone = undefined;
     }
   }
@@ -59,10 +60,6 @@ export async function createNetShopCharge(params: {
     reference: params.reference,
     method: selectedMethod,
   };
-
-  if (params.description) {
-    payload.description = params.description;
-  }
 
   if (selectedMethod === "mpesa" && phone) {
     payload.msisdn = phone;

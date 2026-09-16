@@ -12,6 +12,7 @@ import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
 import { EventDetailsEditor } from "./EventDetailsEditor";
 import { EventPendingPayment } from "./EventPendingPayment";
 import { ReportsSection } from "./ReportsSection";
+import { EventStatusAndScanner } from "./EventStatusAndScanner";
 
 export const dynamic = "force-dynamic";
 
@@ -163,6 +164,16 @@ export default async function EditEventPage({ params }: { params: { id: string }
               }}
             />
           </div>
+        </section>
+
+        {/* Portaria e Conclusão do Evento */}
+        <section>
+          <EventStatusAndScanner
+            eventId={event.id}
+            initialStatus={event.status || "ACTIVE"}
+            initialSecurityPin={event.securityPin || "1234"}
+            completedAt={event.completedAt ? event.completedAt.toISOString() : null}
+          />
         </section>
 
         {/* Relatórios Oficiais em PDF */}

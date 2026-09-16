@@ -70,9 +70,12 @@ model Event {
   showMessages  Boolean @default(true)
   showCountdown Boolean @default(true)
 
-  // Status
-  publishedAt DateTime?
-  isSandbox   Boolean   @default(false)
+  // Status e Portaria
+  status       EventStatus @default(ACTIVE)
+  securityPin  String?     @default("1234")
+  completedAt  DateTime?
+  publishedAt  DateTime?
+  isSandbox    Boolean     @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -84,6 +87,12 @@ model Event {
   whatsAppLogs WhatsAppLog[]
 
   @@index([organizerId])
+}
+
+enum EventStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
 }
 
 model Guest {

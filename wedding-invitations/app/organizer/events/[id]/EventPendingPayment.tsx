@@ -103,11 +103,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
       const data = await res.json();
 
       if (!res.ok) {
-        const err = data.error || "";
-        if (err.includes("validation_error") || err.includes("msisdn")) {
-          throw new Error("Número de telefone inválido para M-Pesa. Introduza um número Vodacom 84/85 válido.");
-        }
-        throw new Error(err || "Erro ao processar pagamento na NetShop");
+        throw new Error(data.error || "Erro ao processar pagamento na NetShop");
       }
 
       if (data.paid) {
