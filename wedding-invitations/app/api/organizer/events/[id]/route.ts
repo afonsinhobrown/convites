@@ -85,3 +85,30 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "Erro interno ao atualizar evento" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const organizerId = await getCurrentOrganizerId();
+    if (!organizerId) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    const eventId = params.id;
+    const existing = await prisma.event.findFirst({
+      where: { id: eventId, organizerId },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
+    }
+
+    await prisma.event.delete({
+      where: { id: eventId },
+    });
+
+    return NextResponse.json({ success: true, message: "Evento eliminado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao eliminar evento:", error);
+    return NextResponse.json({ error: "Erro interno ao eliminar evento" }, { status: 500 });
+  }
+}

@@ -62,8 +62,15 @@ export function InvitesPanel({
 
   // Estados da taxa de convidados
   const [feeModalOpen, setFeeModalOpen] = useState(false);
+  // Só pré-preenche se o contacto for Vodacom 84/85
+  const initialFeePhone = (() => {
+    const clean = (eventData.rsvpContact || "").replace(/\D/g, "");
+    const local = clean.startsWith("258") ? clean.slice(3) : clean;
+    return local.startsWith("84") || local.startsWith("85") ? `+258${local}` : "";
+  })();
+
   const [feeMethod, setFeeMethod] = useState<"mpesa" | "card">("mpesa");
-  const [feePhone, setFeePhone] = useState(eventData.rsvpContact || "");
+  const [feePhone, setFeePhone] = useState(initialFeePhone);
   const [feeLoading, setFeeLoading] = useState(false);
   const [feeError, setFeeError] = useState<string | null>(null);
   const [feeSuccess, setFeeSuccess] = useState<string | null>(null);
@@ -89,15 +96,31 @@ export function InvitesPanel({
       } catch {
         // silencioso
       }
-    }, 4000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [eventId, guestFeePaid, router]);
 
   async function handlePayGuestFee(e: React.FormEvent) {
     e.preventDefault();
-    setFeeLoading(true);
     setFeeError(null);
     setFeeSuccess(null);
+
+    if (feeMethod === "mpesa") {
+      const clean = feePhone.replace(/\D/g, "");
+      const local = clean.startsWith("258") ? clean.slice(3) : clean;
+      if (!local.startsWith("84") && !local.startsWith("85")) {
+        setFeeError(
+          "Para pagar via M-Pesa é necessário um número Vodacom (iniciado por 84 ou 85). Se utiliza outro operador/banco, selecione 'BIM / Cartão'."
+        );
+        return;
+      }
+      if (local.length !== 9) {
+        setFeeError("O número de telefone deve ter 9 dígitos (ex: 84 123 4567).");
+        return;
+      }
+    }
+
+    setFeeLoading(true);
 
     try {
       const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`, {
@@ -108,7 +131,11 @@ export function InvitesPanel({
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao processar pagamento");
+        const err = data.error || "";
+        if (err.includes("validation_error") || err.includes("msisdn")) {
+          throw new Error("Número de telefone inválido para M-Pesa. Introduza um número Vodacom 84/85 válido.");
+        }
+        throw new Error(err || "Erro ao processar pagamento na NetShop");
       }
 
       if (data.paid) {
