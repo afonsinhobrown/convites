@@ -34,7 +34,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     const config = await getSystemConfig();
     const feePerGuestMzn = Math.round(config.invitationFeeCents / 100); // 25 MT
-    const totalMzn = guestCount * feePerGuestMzn;
 
     const body = await request.json().catch(() => ({}));
     const method: NetShopMethod = body.method === "card" ? "card" : "mpesa";
