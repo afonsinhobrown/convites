@@ -14,9 +14,21 @@ export const metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#FDFBF7]">
+    <main className="relative min-h-screen bg-[#FDFBF7] text-gray-900 overflow-hidden">
+      {/* Imagem de Fundo com Transparência Suave e Elegante */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <Image
+          src="/fundo.png"
+          alt="Fundo DoReMi Eventos"
+          fill
+          priority
+          className="object-cover object-center opacity-20 filter saturate-150"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/60 via-[#FDFBF7]/40 to-[#FDFBF7]/80" />
+      </div>
+
       {/* Header com logo DoReMi */}
-      <header className="border-b border-[#C5A059]/30 bg-white">
+      <header className="sticky top-0 z-30 border-b border-[#C5A059]/25 bg-white/85 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -33,7 +45,7 @@ export default function HomePage() {
           <nav className="flex items-center gap-3 text-sm">
             <Link
               href="/login"
-              className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100 transition"
+              className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100/80 transition"
             >
               Entrar
             </Link>
@@ -47,12 +59,12 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-12">
+      <section className="relative z-10 mx-auto max-w-6xl px-4 py-12">
         <div className="text-center">
-          <h1 className="text-4xl font-serif-custom font-bold text-[#1A1A1A]">
+          <h1 className="text-4xl sm:text-5xl font-serif-custom font-bold text-[#1A1A1A] tracking-tight">
             Convites de casamento inesquecíveis
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-gray-600">
+          <p className="mx-auto mt-3 max-w-xl text-sm sm:text-base text-gray-700 font-medium leading-relaxed">
             Escolha um dos nossos modelos, personalize e partilhe o convite digital com os seus
             convidados. Com RSVP e confirmação por QR Code.
           </p>
@@ -62,7 +74,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-[#C5A059]/20 bg-white">
+      <footer className="relative z-10 mt-20 border-t border-[#C5A059]/20 bg-white/85 backdrop-blur-md">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col items-center md:items-start gap-2">
@@ -117,7 +129,7 @@ async function Gallery() {
           <Link
             key={t.id}
             href={`/templates/${t.slug}`}
-            className="group rounded-2xl border border-[#C5A059]/20 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+            className="group rounded-2xl border border-[#C5A059]/25 bg-white/95 backdrop-blur-sm p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-[#C5A059]/60"
           >
             {/* Preview com marca de água */}
             <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "2/3" }}>
