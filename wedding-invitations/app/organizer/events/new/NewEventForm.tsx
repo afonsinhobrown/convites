@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, SlidersHorizontal } from "lucide-react";
+import { getTemplateActiveFields } from "@/lib/designer-layout";
 
 interface TemplateItem {
   id: string;
@@ -28,6 +29,12 @@ interface NewEventFormProps {
     ceremonyAddress: string;
     rsvpContact: string;
     welcomeMessage: string;
+    invitationHeader?: string;
+    invitationIntro?: string;
+    invitationRomantic?: string;
+    invitationHonor?: string;
+    invitationFooter?: string;
+    invitationValues?: string;
   };
 }
 
@@ -38,7 +45,15 @@ export function NewEventForm({
 }: NewEventFormProps) {
   const router = useRouter();
   const [templateSlug, setTemplateSlug] = useState(initialTemplateSlug);
-  const [form, setForm] = useState(defaultValues);
+  const [form, setForm] = useState({
+    ...defaultValues,
+    invitationHeader: defaultValues.invitationHeader ?? "Com a Bênção de Deus",
+    invitationIntro: defaultValues.invitationIntro ?? "Temos a alegria de vos convidar para o nosso casamento",
+    invitationRomantic: defaultValues.invitationRomantic ?? "Duas vidas, dois corações, uma história para toda a vida.",
+    invitationHonor: defaultValues.invitationHonor ?? "Será uma honra celebrar este momento tão especial na presença de vocês.",
+    invitationFooter: defaultValues.invitationFooter ?? "Juntos para sempre",
+    invitationValues: defaultValues.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre",
+  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +63,8 @@ export function NewEventForm({
 
   const selectedTemplate =
     templates.find((t) => t.slug === templateSlug) ?? templates[0];
+
+  const active = getTemplateActiveFields(selectedTemplate?.layoutJson, selectedTemplate?.slug);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -70,7 +87,6 @@ export function NewEventForm({
         return;
       }
 
-      // Redireciona diretamente para o painel de gestão do evento criado
       router.push(`/organizer/events/${data.id}`);
       router.refresh();
     } catch {
@@ -98,40 +114,45 @@ export function NewEventForm({
           </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold text-[#8B5A2B]">
             <Sparkles className="h-3.5 w-3.5" />
-            {selectedTemplate?.name}
+            {selectedTemplate.name}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {templates.map((t) => {
-            const isSelected = t.slug === templateSlug;
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {templates.map((tpl) => {
+            const isSelected = tpl.slug === templateSlug;
             return (
               <button
-                key={t.id}
+                key={tpl.id}
                 type="button"
-                onClick={() => setTemplateSlug(t.slug)}
-                className={`relative rounded-2xl border bg-white p-2.5 text-left shadow-sm transition ${
+                onClick={() => setTemplateSlug(tpl.slug)}
+                className={`group relative flex flex-col overflow-hidden rounded-xl border-2 p-2 text-left transition-all ${
                   isSelected
-                    ? "border-[#C5A059] ring-2 ring-[#C5A059]"
-                    : "border-gray-200 hover:border-[#C5A059]/50"
+                    ? "border-[#C5A059] bg-[#C5A059]/5 shadow-md"
+                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
                 }`}
               >
-                {isSelected && (
-                  <span className="absolute right-2 top-2 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#C5A059]">
-                    <Check className="h-3.5 w-3.5 text-white" />
-                  </span>
-                )}
-                <TemplatePreview
-                  slug={t.slug}
-                  name={t.name}
-                  componentName={t.componentName}
-                  previewUrl={t.previewUrl}
-                  layoutJson={t.layoutJson}
-                  demoData={t.demoData}
-                  className="aspect-[2/3]"
-                />
-                <p className="mt-2 text-xs font-medium text-gray-900 truncate">
-                  {t.name}
+                <div className="relative mb-2 aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
+                  <TemplatePreview
+                    slug={tpl.slug}
+                    name={tpl.name}
+                    componentName={tpl.componentName}
+                    previewUrl={tpl.previewUrl}
+                    layoutJson={tpl.layoutJson}
+                    demoData={tpl.demoData}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                  />
+                  {isSelected && (
+                    <div className="absolute right-2 top-2 rounded-full bg-[#C5A059] p-1 text-white shadow-sm">
+                      <Check className="h-3.5 w-3.5" />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs font-semibold text-gray-900 truncate">
+                  {tpl.name}
+                </p>
+                <p className="text-[11px] text-gray-500">
+                  {(tpl.priceUsdCents / 100).toFixed(2)} USD
                 </p>
               </button>
             );
@@ -139,159 +160,241 @@ export function NewEventForm({
         </div>
       </div>
 
-      {/* FORMULÁRIO PRÉ-PREENCHIDO COM DEMO DATA */}
+      {/* FORMULÁRIO DINÂMICO BASEADO NO MODELO */}
       <div className="rounded-2xl border border-[#C5A059]/20 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">
-          2. Personalizar dados do casamento
-        </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Os campos foram pré-preenchidos com os dados de exemplo do modelo.
-          Substitua com os seus dados reais.
-        </p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              2. Personalizar dados do casamento
+            </h2>
+            <p className="text-sm text-gray-500">
+              O formulário abaixo foi ajustado automaticamente aos componentes do modelo{" "}
+              <strong className="text-gray-700">{selectedTemplate.name}</strong>.
+            </p>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-600 font-medium">
+            <SlidersHorizontal className="h-3 w-3 text-[#C5A059]" />
+            Campos do modelo ativos
+          </span>
+        </div>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Nomes dos Noivos */}
+          {(active.hasBrideName || active.hasGroomName || active.hasCouple) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {(active.hasBrideName || (!active.hasBrideName && !active.hasGroomName && active.hasCouple)) && (
+                <div>
+                  <label htmlFor="brideName" className="block text-sm font-medium text-gray-700">
+                    {active.hasCouple && !active.hasBrideName && !active.hasGroomName
+                      ? "Nome da Noiva (ou 1º Noivo)"
+                      : "Nome da noiva"}
+                  </label>
+                  <input
+                    id="brideName"
+                    type="text"
+                    required
+                    value={form.brideName}
+                    onChange={(e) => update("brideName", e.target.value)}
+                    placeholder="Ex: JÚLIA"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {(active.hasGroomName || (!active.hasBrideName && !active.hasGroomName && active.hasCouple)) && (
+                <div>
+                  <label htmlFor="groomName" className="block text-sm font-medium text-gray-700">
+                    {active.hasCouple && !active.hasBrideName && !active.hasGroomName
+                      ? "Nome do Noivo (ou 2º Noivo)"
+                      : "Nome do noivo"}
+                  </label>
+                  <input
+                    id="groomName"
+                    type="text"
+                    required
+                    value={form.groomName}
+                    onChange={(e) => update("groomName", e.target.value)}
+                    placeholder="Ex: ANTÓNIO"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Data e Hora */}
+          {(active.hasDate || active.hasTime) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {active.hasDate && (
+                <div>
+                  <label htmlFor="weddingDate" className="block text-sm font-medium text-gray-700">
+                    Data do casamento
+                  </label>
+                  <input
+                    id="weddingDate"
+                    type="date"
+                    required
+                    value={form.weddingDate}
+                    onChange={(e) => update("weddingDate", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasTime && (
+                <div>
+                  <label htmlFor="ceremonyTime" className="block text-sm font-medium text-gray-700">
+                    Hora da cerimónia
+                  </label>
+                  <input
+                    id="ceremonyTime"
+                    type="time"
+                    required
+                    value={form.ceremonyTime}
+                    onChange={(e) => update("ceremonyTime", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Local e Morada */}
+          {(active.hasVenue || active.hasAddress) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {active.hasVenue && (
+                <div>
+                  <label htmlFor="ceremonyVenue" className="block text-sm font-medium text-gray-700">
+                    Nome do local
+                  </label>
+                  <input
+                    id="ceremonyVenue"
+                    type="text"
+                    required
+                    value={form.ceremonyVenue}
+                    onChange={(e) => update("ceremonyVenue", e.target.value)}
+                    placeholder="Ex: Quinta dos Coqueiros / Mesquita"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasAddress && (
+                <div>
+                  <label htmlFor="ceremonyAddress" className="block text-sm font-medium text-gray-700">
+                    Endereço / Morada
+                  </label>
+                  <input
+                    id="ceremonyAddress"
+                    type="text"
+                    value={form.ceremonyAddress}
+                    onChange={(e) => update("ceremonyAddress", e.target.value)}
+                    placeholder="Ex: Av. da Marginal, Maputo"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Contacto RSVP */}
+          {active.hasRsvp && (
             <div>
-              <label
-                htmlFor="brideName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Nome da noiva
+              <label htmlFor="rsvpContact" className="block text-sm font-medium text-gray-700">
+                Contacto RSVP
               </label>
               <input
-                id="brideName"
+                id="rsvpContact"
                 type="text"
                 required
-                value={form.brideName}
-                onChange={(e) => update("brideName", e.target.value)}
-                placeholder="Ex: Ana"
+                value={form.rsvpContact}
+                onChange={(e) => update("rsvpContact", e.target.value)}
+                placeholder="Ex: +258 84 123 4567"
                 className={inputClass}
               />
             </div>
-            <div>
-              <label
-                htmlFor="groomName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Nome do noivo
-              </label>
-              <input
-                id="groomName"
-                type="text"
-                required
-                value={form.groomName}
-                onChange={(e) => update("groomName", e.target.value)}
-                placeholder="Ex: Zlatan"
-                className={inputClass}
-              />
-            </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Mensagem / Frase Romântica */}
+          {active.hasRomantic && (
             <div>
-              <label
-                htmlFor="weddingDate"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Data do casamento
+              <label htmlFor="welcomeMessage" className="block text-sm font-medium text-gray-700">
+                Mensagem personalizada / Frase romântica
               </label>
-              <input
-                id="weddingDate"
-                type="date"
-                required
-                value={form.weddingDate}
-                onChange={(e) => update("weddingDate", e.target.value)}
+              <textarea
+                id="welcomeMessage"
+                rows={3}
+                value={form.welcomeMessage}
+                onChange={(e) => {
+                  update("welcomeMessage", e.target.value);
+                  update("invitationRomantic", e.target.value);
+                }}
+                placeholder="Ex: Duas vidas, dois corações, uma história para toda a vida..."
                 className={inputClass}
               />
             </div>
-            <div>
-              <label
-                htmlFor="ceremonyTime"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Hora da cerimónia
-              </label>
-              <input
-                id="ceremonyTime"
-                type="time"
-                required
-                value={form.ceremonyTime}
-                onChange={(e) => update("ceremonyTime", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="ceremonyVenue"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Nome do local
-              </label>
-              <input
-                id="ceremonyVenue"
-                type="text"
-                required
-                value={form.ceremonyVenue}
-                onChange={(e) => update("ceremonyVenue", e.target.value)}
-                placeholder="Ex: Quinta dos Coqueiros"
-                className={inputClass}
-              />
+          {/* Textos adicionais se presentes no modelo */}
+          {(active.hasHeader || active.hasIntro || active.hasHonor || active.hasFooter || active.hasValues) && (
+            <div className="border-t border-gray-200 pt-4 space-y-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8B5A2B]">
+                Textos Especiais do Modelo
+              </h3>
+              {active.hasHeader && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Cabeçalho</label>
+                  <input
+                    type="text"
+                    value={form.invitationHeader}
+                    onChange={(e) => update("invitationHeader", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasIntro && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Introdução do Convite</label>
+                  <input
+                    type="text"
+                    value={form.invitationIntro}
+                    onChange={(e) => update("invitationIntro", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasHonor && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Frase de Homenagem</label>
+                  <input
+                    type="text"
+                    value={form.invitationHonor}
+                    onChange={(e) => update("invitationHonor", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasFooter && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Rodapé</label>
+                  <input
+                    type="text"
+                    value={form.invitationFooter}
+                    onChange={(e) => update("invitationFooter", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasValues && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Valores / Lema</label>
+                  <input
+                    type="text"
+                    value={form.invitationValues}
+                    onChange={(e) => update("invitationValues", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
             </div>
-            <div>
-              <label
-                htmlFor="ceremonyAddress"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Endereço / Morada
-              </label>
-              <input
-                id="ceremonyAddress"
-                type="text"
-                value={form.ceremonyAddress}
-                onChange={(e) => update("ceremonyAddress", e.target.value)}
-                placeholder="Ex: Av. da Marginal, Maputo"
-                className={inputClass}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="rsvpContact"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Contacto RSVP
-            </label>
-            <input
-              id="rsvpContact"
-              type="text"
-              required
-              value={form.rsvpContact}
-              onChange={(e) => update("rsvpContact", e.target.value)}
-              placeholder="Ex: +258 84 123 4567"
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="welcomeMessage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Mensagem personalizada (opcional)
-            </label>
-            <textarea
-              id="welcomeMessage"
-              rows={3}
-              value={form.welcomeMessage}
-              onChange={(e) => update("welcomeMessage", e.target.value)}
-              placeholder="Ex: Duas vidas, dois corações, uma história para toda a vida..."
-              className={inputClass}
-            />
-          </div>
+          )}
 
           {error && (
             <div
@@ -302,13 +405,15 @@ export function NewEventForm({
             </div>
           )}
 
-          <div className="pt-2">
+          <div className="pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-[#C5A059] px-6 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-[#b08f4a] focus:outline-none focus:ring-2 focus:ring-[#C5A059] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-[#C5A059] px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-[#B38F48] focus:outline-none focus:ring-2 focus:ring-[#C5A059] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "A guardar convite..." : "Guardar e avançar para convidados & fotos →"}
+              {loading
+                ? "A gravar e preparar convite..."
+                : "Avançar para Pagamento do Modelo →"}
             </button>
           </div>
         </div>

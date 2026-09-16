@@ -119,6 +119,8 @@ export default async function EditEventPage({ params }: { params: { id: string }
           <div>
             <EventDetailsEditor
               eventId={event.id}
+              templateLayoutJson={currentTemplate?.layoutJson}
+              templateSlug={currentTemplate?.slug}
               initialData={{
                 brideName: event.brideName,
                 groomName: event.groomName,

@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Edit2, Check, X } from "lucide-react";
+import { Edit2, X } from "lucide-react";
+import { getTemplateActiveFields } from "@/lib/designer-layout";
 
 interface EventDataProps {
   eventId: string;
+  templateLayoutJson?: unknown;
+  templateSlug?: string;
   initialData: {
     brideName: string;
     groomName: string;
@@ -24,12 +27,19 @@ interface EventDataProps {
   };
 }
 
-export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
+export function EventDetailsEditor({
+  eventId,
+  templateLayoutJson,
+  templateSlug,
+  initialData,
+}: EventDataProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const active = getTemplateActiveFields(templateLayoutJson, templateSlug);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -96,7 +106,12 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
         <div className="flex items-center justify-between border-b pb-3">
-          <h3 className="text-lg font-bold text-gray-900">Editar dados do casamento</h3>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Editar dados do casamento</h3>
+            <p className="text-xs text-gray-500">
+              Mostrando os campos utilizados pelo modelo do seu convite.
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
@@ -107,146 +122,180 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
         </div>
 
         <form onSubmit={handleSave} className="mt-4 space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Nomes dos Noivos */}
+          {(active.hasBrideName || active.hasGroomName || active.hasCouple) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {(active.hasBrideName || (!active.hasBrideName && !active.hasGroomName && active.hasCouple)) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {active.hasCouple && !active.hasBrideName && !active.hasGroomName
+                      ? "Nome da Noiva (ou 1º Noivo)"
+                      : "Nome da noiva"}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.brideName}
+                    onChange={(e) => update("brideName", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {(active.hasGroomName || (!active.hasBrideName && !active.hasGroomName && active.hasCouple)) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {active.hasCouple && !active.hasBrideName && !active.hasGroomName
+                      ? "Nome do Noivo (ou 2º Noivo)"
+                      : "Nome do noivo"}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.groomName}
+                    onChange={(e) => update("groomName", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Data e Hora */}
+          {(active.hasDate || active.hasTime) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {active.hasDate && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Data do casamento</label>
+                  <input
+                    type="date"
+                    required
+                    value={form.weddingDateRaw}
+                    onChange={(e) => update("weddingDateRaw", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasTime && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Hora da cerimónia</label>
+                  <input
+                    type="time"
+                    required
+                    value={form.ceremonyTime}
+                    onChange={(e) => update("ceremonyTime", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Local e Morada */}
+          {(active.hasVenue || active.hasAddress) && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {active.hasVenue && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Local da cerimónia</label>
+                  <input
+                    type="text"
+                    required
+                    value={form.ceremonyVenue}
+                    onChange={(e) => update("ceremonyVenue", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {active.hasAddress && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Endereço / Morada</label>
+                  <input
+                    type="text"
+                    value={form.ceremonyAddress}
+                    onChange={(e) => update("ceremonyAddress", e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Contacto RSVP */}
+          {active.hasRsvp && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nome da noiva</label>
+              <label className="block text-sm font-medium text-gray-700">Contacto RSVP</label>
               <input
                 type="text"
                 required
-                value={form.brideName}
-                onChange={(e) => update("brideName", e.target.value)}
+                value={form.rsvpContact}
+                onChange={(e) => update("rsvpContact", e.target.value)}
                 className={inputClass}
               />
             </div>
+          )}
+
+          {/* Mensagem / Frase Romântica */}
+          {active.hasRomantic && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nome do noivo</label>
-              <input
-                type="text"
-                required
-                value={form.groomName}
-                onChange={(e) => update("groomName", e.target.value)}
+              <label className="block text-sm font-medium text-gray-700">Mensagem personalizada / Frase</label>
+              <textarea
+                rows={2}
+                value={form.welcomeMessage}
+                onChange={(e) => {
+                  update("welcomeMessage", e.target.value);
+                  update("invitationRomantic", e.target.value);
+                }}
                 className={inputClass}
               />
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Data do casamento</label>
-              <input
-                type="date"
-                required
-                value={form.weddingDateRaw}
-                onChange={(e) => update("weddingDateRaw", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Hora da cerimónia</label>
-              <input
-                type="time"
-                required
-                value={form.ceremonyTime}
-                onChange={(e) => update("ceremonyTime", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
+          {/* Textos adicionais específicos do modelo */}
+          {(active.hasHeader || active.hasIntro || active.hasHonor || active.hasFooter || active.hasValues) && (
+            <div className="border-t border-gray-200 pt-4 space-y-3">
+              <h4 className="text-xs font-semibold text-[#8B5A2B] uppercase tracking-wider">
+                Textos do Convite
+              </h4>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Local da cerimónia</label>
-              <input
-                type="text"
-                required
-                value={form.ceremonyVenue}
-                onChange={(e) => update("ceremonyVenue", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Endereço</label>
-              <input
-                type="text"
-                value={form.ceremonyAddress}
-                onChange={(e) => update("ceremonyAddress", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
+              {active.hasHeader && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Cabeçalho</label>
+                  <input
+                    type="text"
+                    value={form.invitationHeader}
+                    onChange={(e) => update("invitationHeader", e.target.value)}
+                    placeholder="Com a Bênção de Deus"
+                    className={inputClass}
+                  />
+                </div>
+              )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Contacto RSVP</label>
-            <input
-              type="text"
-              required
-              value={form.rsvpContact}
-              onChange={(e) => update("rsvpContact", e.target.value)}
-              className={inputClass}
-            />
-          </div>
+              {active.hasIntro && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Introdução do Convite</label>
+                  <input
+                    type="text"
+                    value={form.invitationIntro}
+                    onChange={(e) => update("invitationIntro", e.target.value)}
+                    placeholder="Temos a alegria de vos convidar para o nosso casamento"
+                    className={inputClass}
+                  />
+                </div>
+              )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Mensagem personalizada</label>
-            <textarea
-              rows={2}
-              value={form.welcomeMessage}
-              onChange={(e) => update("welcomeMessage", e.target.value)}
-              className={inputClass}
-            />
-          </div>
+              {active.hasHonor && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Homenagem / Presença</label>
+                  <input
+                    type="text"
+                    value={form.invitationHonor}
+                    onChange={(e) => update("invitationHonor", e.target.value)}
+                    placeholder="Será uma honra celebrar este momento tão especial na presença de vocês."
+                    className={inputClass}
+                  />
+                </div>
+              )}
 
-          <div className="border-t pt-4">
-            <h4 className="text-sm font-semibold text-[#8B5A2B] uppercase tracking-wider mb-3">
-              Textos do Convite
-            </h4>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700">Cabeçalho</label>
-                <input
-                  type="text"
-                  value={form.invitationHeader}
-                  onChange={(e) => update("invitationHeader", e.target.value)}
-                  placeholder="Com a Bênção de Deus"
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700">Introdução do Convite</label>
-                <input
-                  type="text"
-                  value={form.invitationIntro}
-                  onChange={(e) => update("invitationIntro", e.target.value)}
-                  placeholder="Temos a alegria de vos convidar para o nosso casamento"
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700">Frase Romântica</label>
-                <input
-                  type="text"
-                  value={form.invitationRomantic}
-                  onChange={(e) => update("invitationRomantic", e.target.value)}
-                  placeholder="Duas vidas, dois corações, uma história para toda a vida."
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700">Homenagem / Presença</label>
-                <input
-                  type="text"
-                  value={form.invitationHonor}
-                  onChange={(e) => update("invitationHonor", e.target.value)}
-                  placeholder="Será uma honra celebrar este momento tão especial na presença de vocês."
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {active.hasFooter && (
                 <div>
                   <label className="block text-xs font-medium text-gray-700">Rodapé</label>
                   <input
@@ -257,8 +306,11 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
                     className={inputClass}
                   />
                 </div>
+              )}
+
+              {active.hasValues && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700">Valores / Lema</label>
+                  <label className="block text-xs font-medium text-gray-700">Valores / Mensagem de Fundo</label>
                   <input
                     type="text"
                     value={form.invitationValues}
@@ -267,9 +319,9 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
                     className={inputClass}
                   />
                 </div>
-              </div>
+              )}
             </div>
-          </div>
+          )}
 
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -277,7 +329,7 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
             </div>
           )}
 
-          <div className="mt-6 flex justify-end gap-3 pt-2">
+          <div className="mt-6 flex justify-end gap-3 border-t pt-4">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
@@ -288,10 +340,9 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#C5A059] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#b08f4a] disabled:opacity-50"
+              className="rounded-lg bg-[#C5A059] px-5 py-2 text-sm font-medium text-white shadow hover:bg-[#B38F48] disabled:opacity-50"
             >
-              <Check className="h-4 w-4" />
-              {loading ? "A guardar..." : "Guardar dados"}
+              {loading ? "A guardar..." : "Guardar Alterações"}
             </button>
           </div>
         </form>

@@ -33,6 +33,7 @@ export const FIELD_ORDER = {
   brideParents: "Pais da Noiva",
   brideName: "Noiva",
   groomName: "Noivo",
+  noivos: "Noivos (JÚLIA & ANTÓNIO)",
   mosque: "Mesquita",
   mosqueLocation: "Local da Mesquita",
   invitationIntro: "Introdução",
@@ -187,6 +188,7 @@ export function emptyField(key: string): LayoutField {
   const isName =
     key === "brideName" ||
     key === "groomName" ||
+    key === "noivos" ||
     key === "groomArabicName" ||
     key === "brideArabicName";
   const isPhoto = key === "photoLeft" || key === "photoRight";
@@ -405,6 +407,13 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.data_islao || "14 de Rabīʿ al-Thānī de 1448 H";
     case "ele_esposa":
       return data.ele_esposa || "Lucas Whilo e Esposa";
+    case "noivos":
+      return (
+        data.noivos ||
+        (data.brideName && data.groomName
+          ? `${data.brideName} & ${data.groomName}`
+          : data.brideName || data.groomName || "JÚLIA & ANTÓNIO")
+      );
     case "locationName":
       return data.locationName ?? data.venue ?? "";
     case "locationAddress":
@@ -454,6 +463,7 @@ export type InvitationFieldData = {
   data_setembro?: string;
   data_islao?: string;
   ele_esposa?: string;
+  noivos?: string;
   venue: string;
   address: string;
   rsvpContact: string;
@@ -484,4 +494,110 @@ export function getFieldValueWithSource(
   const realKey = field?.sourceKey || key;
   const base = { ...data, sourceKey: undefined } as unknown as Record<string, string | undefined>;
   return dataValue(realKey, base);
+}
+
+export interface ActiveTemplateFields {
+  hasCouple: boolean;
+  hasBrideName: boolean;
+  hasGroomName: boolean;
+  hasGroomArabicName: boolean;
+  hasBrideArabicName: boolean;
+  hasGroomParents: boolean;
+  hasBrideParents: boolean;
+  hasEleEsposa: boolean;
+  hasDate: boolean;
+  hasTime: boolean;
+  hasVenue: boolean;
+  hasAddress: boolean;
+  hasRsvp: boolean;
+  hasHeader: boolean;
+  hasIntro: boolean;
+  hasRomantic: boolean;
+  hasHonor: boolean;
+  hasFooter: boolean;
+  hasValues: boolean;
+  hasPhotos: boolean;
+  totalActive: number;
+}
+
+export function getTemplateActiveFields(
+  layoutJson?: unknown,
+  slug?: string
+): ActiveTemplateFields {
+  let layout: LayoutJson = {};
+  if (layoutJson && typeof layoutJson === "object" && Object.keys(layoutJson).length > 0) {
+    layout = layoutJson as LayoutJson;
+  } else if (slug && DEFAULT_LAYOUTS[slug]) {
+    layout = DEFAULT_LAYOUTS[slug];
+  }
+
+  const rawKeys = Object.keys(layout);
+  if (rawKeys.length === 0) {
+    // Fallback padrão se o layout estiver vazio
+    return {
+      hasCouple: true,
+      hasBrideName: true,
+      hasGroomName: true,
+      hasGroomArabicName: false,
+      hasBrideArabicName: false,
+      hasGroomParents: false,
+      hasBrideParents: false,
+      hasEleEsposa: false,
+      hasDate: true,
+      hasTime: true,
+      hasVenue: true,
+      hasAddress: true,
+      hasRsvp: true,
+      hasHeader: false,
+      hasIntro: false,
+      hasRomantic: true,
+      hasHonor: false,
+      hasFooter: false,
+      hasValues: false,
+      hasPhotos: false,
+      totalActive: 0,
+    };
+  }
+
+  const activeKeys = new Set<string>();
+  for (const [key, field] of Object.entries(layout)) {
+    const realKey = field?.sourceKey || key.split("_")[0];
+    activeKeys.add(realKey);
+    activeKeys.add(key);
+  }
+
+  const has = (k: string) => activeKeys.has(k);
+
+  return {
+    hasCouple: has("noivos"),
+    hasBrideName: has("brideName"),
+    hasGroomName: has("groomName"),
+    hasGroomArabicName: has("groomArabicName"),
+    hasBrideArabicName: has("brideArabicName"),
+    hasGroomParents: has("groomParents"),
+    hasBrideParents: has("brideParents"),
+    hasEleEsposa: has("ele_esposa"),
+    hasDate:
+      has("day") ||
+      has("month") ||
+      has("year") ||
+      has("dia1") ||
+      has("mes1") ||
+      has("ano1") ||
+      has("data_completa") ||
+      has("data_setembro") ||
+      has("data_islao"),
+    hasTime: has("time") || has("hora1"),
+    hasVenue: has("locationName") || has("venue") || has("mosque"),
+    hasAddress: has("locationAddress") || has("address") || has("mosqueLocation"),
+    hasRsvp: has("rsvpContact"),
+    hasHeader: has("invitationHeader"),
+    hasIntro: has("invitationIntro"),
+    hasRomantic: has("invitationRomantic") || has("welcomeMessage"),
+    hasHonor: has("invitationHonor"),
+    hasFooter: has("invitationFooter"),
+    hasValues: has("invitationValues"),
+    hasPhotos: has("photoLeft") || has("photoRight"),
+    totalActive: rawKeys.length,
+  };
 }
