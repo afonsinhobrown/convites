@@ -5,6 +5,8 @@ import { getSystemConfig } from "@/lib/config";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { Watermark } from "@/components/Watermark";
 
+import { PublicidadeSection } from "@/components/PublicidadeSection";
+
 export const dynamic = "force-dynamic";
 
 export const metadata = {
@@ -26,7 +28,7 @@ export default function HomePage() {
       <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-[#FDFBF7]/70 via-transparent to-[#FDFBF7]/90" />
 
       {/* Header com logo DoReMi */}
-      <header className="sticky top-0 z-30 border-b border-[#C5A059]/30 bg-white/95 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-30 border-b border-[#C5A059]/30 bg-white/90 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -94,6 +96,9 @@ export default function HomePage() {
         </div>
 
         <Gallery />
+
+        {/* Espaço de Publicidade & Vídeo DoReMi */}
+        <PublicidadeSection />
       </section>
 
       {/* Footer */}
