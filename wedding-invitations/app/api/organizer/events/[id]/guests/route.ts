@@ -26,6 +26,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     const body = await request.json();
+    const currentCount = await prisma.guest.count({ where: { eventId } });
 
     // Suporte para importação em lote (bulk)
     if (Array.isArray(body?.guests)) {
@@ -58,6 +59,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
         return NextResponse.json({ error: "Nenhum convidado válido fornecido" }, { status: 400 });
       }
 
+      if (existing.isSandbox && currentCount + guestsToInsert.length > 6) {
+        return NextResponse.json(
+          { error: `Em modo Sandbox só é permitido no máximo 6 convidados por evento. Atualmente tem ${currentCount}.` },
+          { status: 400 }
+        );
+      }
+
       await prisma.guest.createMany({
         data: guestsToInsert,
       });
@@ -69,6 +77,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     // Inserção individual clássica
+    if (existing.isSandbox && currentCount >= 6) {
+      return NextResponse.json(
+        { error: "Limite atingido: em modo Sandbox só é permitido gerar no máximo 6 convidados." },
+        { status: 400 }
+      );
+    }
+
     const name = String(body?.name ?? "").trim();
     const phoneRaw = String(body?.phone ?? "").trim() || null;
     const phone = phoneRaw ? normalizeMozPhone(phoneRaw) || phoneRaw : null;

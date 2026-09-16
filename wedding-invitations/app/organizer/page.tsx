@@ -5,6 +5,7 @@ import { getCurrentOrganizerId } from "@/lib/session";
 import { formatEventDate } from "@/lib/invitation";
 import { CreateEventForm } from "./CreateEventForm";
 import { LogoutButton } from "./LogoutButton";
+import { ChangePasswordModal } from "./ChangePasswordModal";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,10 @@ export default async function OrganizerPanel() {
             <h1 className="text-xl font-serif-custom font-bold text-[#1A1A1A]">Meu painel</h1>
             <p className="text-sm text-gray-500">Olá, {organizer.name}</p>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-2">
+            <ChangePasswordModal />
+            <LogoutButton />
+          </div>
         </div>
       </header>
 

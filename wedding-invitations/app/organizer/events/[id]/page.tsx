@@ -185,7 +185,11 @@ export default async function EditEventPage({ params }: { params: { id: string }
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <h2 className="mb-3 text-lg font-semibold text-gray-900">Adicionar convidados</h2>
-            <GuestForm eventId={event.id} />
+            <GuestForm
+              eventId={event.id}
+              isSandbox={event.isSandbox}
+              currentCount={guests.length}
+            />
           </div>
           <div>
             <h2 className="mb-3 text-lg font-semibold text-gray-900">Convites</h2>
@@ -196,6 +200,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
               guestFeePaid={!!event.guestFeePaidAt}
               guestFeeCents={event.guestFeeCents || 2500}
               sandboxAllowed={config.sandboxEnabled ?? true}
+              isSandbox={event.isSandbox}
               template={{
                 layout: currentTemplate?.componentName ?? event.templateSlug,
                 layoutJson: currentTemplate?.layoutJson ?? null,

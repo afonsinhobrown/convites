@@ -4,7 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus, Users, Sparkles } from "lucide-react";
 
-export function GuestForm({ eventId }: { eventId: string }) {
+export function GuestForm({
+  eventId,
+  isSandbox = false,
+  currentCount = 0,
+}: {
+  eventId: string;
+  isSandbox?: boolean;
+  currentCount?: number;
+}) {
   const router = useRouter();
   const [tab, setTab] = useState<"single" | "bulk">("single");
 
@@ -16,6 +24,8 @@ export function GuestForm({ eventId }: { eventId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const isAtLimit = isSandbox && currentCount >= 6;
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -105,6 +115,20 @@ export function GuestForm({ eventId }: { eventId: string }) {
 
   return (
     <div className="rounded-2xl border border-[#C5A059]/20 bg-white p-5 shadow-sm">
+      {isSandbox && (
+        <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+          <div className="flex items-center justify-between font-semibold">
+            <span>🧪 Evento em Modo Sandbox</span>
+            <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[11px]">
+              {currentCount} / 6 convidados
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] text-amber-800">
+            O modo sandbox permite testar todas as funcionalidades até um limite de 6 convidados.
+          </p>
+        </div>
+      )}
+
       {/* Abas */}
       <div className="flex border-b border-gray-100 mb-4 pb-2 gap-4">
         <button
@@ -152,6 +176,7 @@ export function GuestForm({ eventId }: { eventId: string }) {
                 id="guestName"
                 type="text"
                 required
+                disabled={isAtLimit}
                 value={form.name}
                 onChange={(e) => update("name", e.target.value)}
                 placeholder="Ex: Maria Nhantumbo"
@@ -165,6 +190,7 @@ export function GuestForm({ eventId }: { eventId: string }) {
               <input
                 id="guestPhone"
                 type="tel"
+                disabled={isAtLimit}
                 value={form.phone}
                 onChange={(e) => update("phone", e.target.value)}
                 placeholder="Ex: +258 84 123 4567"
@@ -178,6 +204,7 @@ export function GuestForm({ eventId }: { eventId: string }) {
               <input
                 id="guestEmail"
                 type="email"
+                disabled={isAtLimit}
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
                 placeholder="Ex: maria@email.com"
@@ -193,6 +220,7 @@ export function GuestForm({ eventId }: { eventId: string }) {
                 type="number"
                 min={0}
                 max={9}
+                disabled={isAtLimit}
                 value={form.maxCompanions}
                 onChange={(e) => update("maxCompanions", e.target.value)}
                 className={inputClass}
@@ -213,11 +241,11 @@ export function GuestForm({ eventId }: { eventId: string }) {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isAtLimit}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[#C5A059] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#b08f4a] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <UserPlus className="h-4 w-4" />
-            {loading ? "A adicionar..." : "Adicionar convidado"}
+            {loading ? "A adicionar..." : isAtLimit ? "Limite Sandbox atingido (6/6)" : "Adicionar convidado"}
           </button>
         </form>
       ) : (
@@ -232,6 +260,7 @@ export function GuestForm({ eventId }: { eventId: string }) {
             <textarea
               rows={5}
               required
+              disabled={isAtLimit}
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
               placeholder={"Carlos Macuácua, +258840001111, 1\nBeatriz Cossa, +258820002222\nDr. Fernando Silva"}
@@ -252,11 +281,11 @@ export function GuestForm({ eventId }: { eventId: string }) {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isAtLimit}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Sparkles className="h-4 w-4" />
-            {loading ? "A importar lista..." : "Importar todos"}
+            {loading ? "A importar lista..." : isAtLimit ? "Limite Sandbox atingido (6/6)" : "Importar todos"}
           </button>
         </form>
       )}

@@ -41,6 +41,24 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const phone = normalizeMozPhone(phoneRaw) || phoneRaw;
 
     const isSandboxActive = Boolean(body.isSandbox) && (config.sandboxEnabled ?? true);
+
+    if (isSandboxActive) {
+      const existingSandboxEvent = await prisma.event.findFirst({
+        where: {
+          organizerId,
+          isSandbox: true,
+          id: { not: event.id },
+          templatePaidAt: { not: null },
+        },
+      });
+      if (existingSandboxEvent) {
+        return NextResponse.json(
+          { error: "O modo Sandbox permite apenas 1 evento de teste por promotor. Para novos eventos, realize o pagamento em modo Live." },
+          { status: 400 }
+        );
+      }
+    }
+
     const priceMzn = isSandboxActive ? 10 : Math.round((template.priceUsdCents / 100) * config.bimExchangeRate);
     const description = isSandboxActive ? "doremi modo sandbox" : undefined;
     const shortId = event.id.replace(/-/g, "").slice(0, 8);

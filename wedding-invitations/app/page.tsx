@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { getSystemConfig } from "@/lib/config";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { Watermark } from "@/components/Watermark";
-import { Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -33,22 +32,14 @@ export default function HomePage() {
 
           <nav className="flex items-center gap-3 text-sm">
             <Link
-              href="/designer/login"
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-              title="Acesso do designer"
-            >
-              <Palette className="h-4 w-4" />
-              Designer
-            </Link>
-            <Link
-              href="/organizer/login"
-              className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100"
+              href="/login"
+              className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100 transition"
             >
               Entrar
             </Link>
             <Link
               href="/organizer/register"
-              className="rounded-lg bg-[#C5A059] px-3 py-1.5 font-medium text-white shadow-sm hover:bg-[#b08f4a]"
+              className="rounded-lg bg-[#C5A059] px-3.5 py-1.5 font-medium text-white shadow-sm hover:bg-[#b08f4a] transition"
             >
               Criar conta
             </Link>
@@ -69,6 +60,42 @@ export default function HomePage() {
 
         <Gallery />
       </section>
+
+      {/* Footer */}
+      <footer className="mt-20 border-t border-[#C5A059]/20 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <Image
+                src="/doremi-logo.jpg"
+                alt="DoReMi Eventos"
+                width={130}
+                height={32}
+                className="h-8 w-auto object-contain"
+              />
+              <p className="text-xs text-gray-500">
+                Plataforma de convites digitais exclusivos para casamentos e eventos.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
+              <Link href="/login?tab=organizer" className="hover:text-[#C5A059] transition">
+                Área do Promotor
+              </Link>
+              <Link href="/login?tab=designer" className="hover:text-[#C5A059] transition">
+                Área do Designer
+              </Link>
+              <Link href="/login?tab=admin" className="hover:text-[#C5A059] transition font-medium text-gray-700">
+                SuperAdmin & Finanças
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
+            &copy; {new Date().getFullYear()} DoReMi Eventos. Todos os direitos reservados.
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

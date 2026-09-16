@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Designer, InvitationTemplate } from "@prisma/client";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
+import { ChangeDesignerPasswordModal } from "./ChangeDesignerPasswordModal";
 
 type Status = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 
@@ -234,6 +235,7 @@ export function DesignerDashboard({
             >
               <span>+ Adicionar modelo →</span>
             </Link>
+            <ChangeDesignerPasswordModal />
             <button
               onClick={async () => {
                 await fetch("/api/designer/logout", {

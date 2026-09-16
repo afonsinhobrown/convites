@@ -49,6 +49,7 @@ export function InvitesPanel({
   guestFeePaid = false,
   guestFeeCents = 2500,
   sandboxAllowed = true,
+  isSandbox = false,
 }: {
   eventId: string;
   initialGuests: InviteGuest[];
@@ -57,6 +58,7 @@ export function InvitesPanel({
   guestFeePaid?: boolean;
   guestFeeCents?: number;
   sandboxAllowed?: boolean;
+  isSandbox?: boolean;
 }) {
   const router = useRouter();
   const [guests, setGuests] = useState<InviteGuest[]>(initialGuests);
@@ -277,7 +279,14 @@ export function InvitesPanel({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-gray-900">Convidados ({guests.length})</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-gray-900">Convidados ({guests.length})</h3>
+          {isSandbox && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+              Modo Sandbox (Máx 6)
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"

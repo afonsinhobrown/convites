@@ -85,6 +85,7 @@ model Event {
   gifts    Gift[]
   messages Message[]
   whatsAppLogs WhatsAppLog[]
+  payments     Payment[]
 
   @@index([organizerId])
 }
@@ -255,9 +256,21 @@ model SystemConfig {
   updatedAt          DateTime @updatedAt
 }
 
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  isMaster     Boolean  @default(false)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Payment {
   id          String        @id @default(uuid())
   eventId     String
+  event       Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   type        PaymentType
   amountCents Int
   currency    String        @default("MZN")
