@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Rnd } from "react-rnd";
+import { Trash2, Lock, Unlock, Copy } from "lucide-react";
 import type { InvitationTemplate } from "@prisma/client";
 import {
   CANVAS,
@@ -121,17 +122,20 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
     setSelected(key);
   }
 
-  function removeField(key: string) {
+  const removeField = useCallback((key: string) => {
     setLayout((prev) => {
       const next = { ...prev };
       delete next[key];
       return next;
     });
-    const remaining = orderedKeys(layout).filter((k) => k !== key);
-    if (remaining.length > 0) {
-      setSelected(remaining[0]);
-    }
-  }
+    setLayout((curr) => {
+      const remaining = orderedKeys(curr).filter((k) => k !== key);
+      if (remaining.length > 0) {
+        setSelected(remaining[0]);
+      }
+      return curr;
+    });
+  }, []);
 
   function removeSelected() {
     if (!selected) return;
@@ -141,6 +145,30 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
   function resetLayout() {
     setLayout(defaultLayout(template.slug));
   }
+
+  // Atalho de Teclado: Delete ou Backspace apaga o componente selecionado
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if ((e.key === "Delete" || e.key === "Backspace") && selected) {
+        e.preventDefault();
+        removeField(selected as string);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selected, removeField]);
 
   async function handleSave() {
     setSaving(true);
@@ -301,21 +329,22 @@ return (
           <div className="mb-5 grid grid-cols-2 gap-1.5">
             {orderedKeys(layout).map((key) => {
               const copied = (key as string).includes("_cop");
+              const isSel = selected === key;
               return (
                 <div
                   key={key}
-                  className={`group relative flex items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
-                    selected === key
-                      ? "bg-rose-600 text-white"
+                  className={`group relative flex items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-all shadow-sm ${
+                    isSel
+                      ? "bg-rose-600 text-white shadow-rose-200"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   <button
                     onClick={() => setSelected(key)}
-                    className="flex-1 text-left truncate mr-1"
+                    className="flex-1 text-left truncate mr-1.5 font-semibold"
                   >
                     {FIELD_ORDER[key] ?? key}
-                    {copied ? <span className="opacity-70"> (cópia)</span> : null}
+                    {copied ? <span className="opacity-75 text-[10px]"> (cópia)</span> : null}
                     {layout[key as string]?.locked ? " 🔒" : ""}
                   </button>
                   <button
@@ -324,12 +353,14 @@ return (
                       e.stopPropagation();
                       removeField(key as string);
                     }}
-                    className={`rounded px-1 text-[10px] opacity-60 hover:opacity-100 transition ${
-                      selected === key ? "hover:bg-rose-700 text-white" : "hover:bg-gray-300 text-red-600"
+                    className={`rounded p-1 transition flex items-center justify-center ${
+                      isSel
+                        ? "bg-rose-700/80 hover:bg-rose-800 text-white"
+                        : "hover:bg-red-100 text-red-600 opacity-70 group-hover:opacity-100"
                     }`}
-                    title={`Remover ${FIELD_ORDER[key] ?? key}`}
+                    title={`Apagar componente "${FIELD_ORDER[key] ?? key}"`}
                   >
-                    ✕
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               );
@@ -354,24 +385,28 @@ return (
             </div>
 
             {/* Ações do campo */}
-            <div className="flex gap-1.5 pb-1">
+            <div className="flex gap-1.5 pb-2">
               <button
                 onClick={duplicateSelected}
-                className="flex-1 rounded-md border border-gray-300 px-2 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
               >
+                <Copy className="h-3.5 w-3.5 text-gray-500" />
                 Duplicar
               </button>
               <button
                 onClick={() => updateField(selected, { locked: !selectedField?.locked })}
-                className="flex-1 rounded-md border border-gray-300 px-2 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
               >
-                {selectedField?.locked ? "Fixar: on" : "Fixar: off"}
+                {selectedField?.locked ? <Lock className="h-3.5 w-3.5 text-amber-600" /> : <Unlock className="h-3.5 w-3.5 text-gray-500" />}
+                {selectedField?.locked ? "Fixado" : "Livre"}
               </button>
               <button
                 onClick={removeSelected}
-                className="flex-1 rounded-md border border-red-200 px-2 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-red-300 bg-red-50 px-2 py-2 text-xs font-bold text-red-700 shadow-sm transition-colors hover:bg-red-100 hover:border-red-400"
+                title="Apagar este componente do convite (ou prima Delete no teclado)"
               >
-                Remover
+                <Trash2 className="h-3.5 w-3.5 text-red-600" />
+                Apagar
               </button>
             </div>
 
@@ -595,14 +630,34 @@ return (
                     }}
                   >
                     <div
-                      className="pointer-events-none absolute -top-6 left-0 z-index"
+                      className="pointer-events-none absolute -top-6 left-0"
                       style={{ zIndex: 50 }}
                     >
-                      <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                      <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white shadow-sm">
                         {fieldLabel(key)}
                         {(key as string).includes("_cop") ? " (cópia)" : ""}
                       </span>
                     </div>
+
+                    {isSelected && (
+                      <div
+                        className="absolute -top-7 right-0 flex items-center gap-1 z-50 pointer-events-auto"
+                        style={{ zIndex: 60 }}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeField(key as string);
+                          }}
+                          className="flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white shadow-md hover:bg-red-700 transition cursor-pointer"
+                          title="Apagar este componente (ou prima Delete no teclado)"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          Apagar
+                        </button>
+                      </div>
+                    )}
                     <div
                       className={`flex h-full w-full items-center justify-center px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
                       style={fieldStyle(f)}
