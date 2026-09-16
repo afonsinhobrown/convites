@@ -10,6 +10,8 @@ export interface InvitationData {
   time: string;
   venue: string;
   address: string;
+  locationName?: string;
+  locationAddress?: string;
   rsvpContact: string;
   rsvpDate?: string;
   welcomeMessage?: string;

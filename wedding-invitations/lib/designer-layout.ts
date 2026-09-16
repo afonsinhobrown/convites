@@ -337,9 +337,9 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
     case "time":
       return data.time ?? "";
     case "locationName":
-      return data.venue ?? "";
+      return data.locationName ?? data.venue ?? "";
     case "locationAddress":
-      return data.address ?? "";
+      return data.locationAddress ?? data.address ?? "";
     case "invitationHeader":
       return data.invitationHeader ?? "Com a Bênção de Deus";
     case "invitationIntro":

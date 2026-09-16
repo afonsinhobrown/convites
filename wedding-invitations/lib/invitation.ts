@@ -56,19 +56,32 @@ export function formatRsvpDate(date: Date): string {
 }
 
 export function eventToInvitationData(event: Event): InvitationData {
-  const { day, month, year } = formatEventDate(event.weddingDate);
+  const d = event.weddingDate ?? new Date();
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = MONTHS_PT[d.getMonth()] ?? d.toLocaleDateString("pt-PT", { month: "long" }).toUpperCase();
+  const year = String(d.getFullYear());
+
   return {
-    brideName: event.brideName,
-    groomName: event.groomName,
+    brideName: event.brideName ?? "",
+    groomName: event.groomName ?? "",
     day,
     month,
     year,
-    time: event.ceremonyTime,
-    venue: event.ceremonyVenue,
-    address: event.ceremonyAddress,
-    rsvpContact: event.rsvpContact,
+    time: event.ceremonyTime ?? "",
+    locationName: event.ceremonyVenue ?? "",
+    locationAddress: event.ceremonyAddress ?? "",
+    venue: event.ceremonyVenue ?? "",
+    address: event.ceremonyAddress ?? "",
+    rsvpContact: event.rsvpContact ?? "",
+    guestName: "", // preenchido depois no contexto do convidado
     rsvpDate: event.rsvpDeadline ? formatRsvpDate(event.rsvpDeadline) : undefined,
     welcomeMessage: event.welcomeMessage ?? undefined,
+    invitationHeader: event.invitationHeader ?? "Com a Bênção de Deus",
+    invitationIntro: event.invitationIntro ?? "Temos a alegria de vos convidar para o nosso casamento",
+    invitationRomantic: event.invitationRomantic ?? "Duas vidas, dois corações, uma história para toda a vida.",
+    invitationHonor: event.invitationHonor ?? "Será uma honra celebrar este momento tão especial na presença de vocês.",
+    invitationFooter: event.invitationFooter ?? "Juntos para sempre",
+    invitationValues: event.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre",
     photoLeft: event.photoLeft ?? undefined,
     photoRight: event.photoRight ?? undefined,
   };

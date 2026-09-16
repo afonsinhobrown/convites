@@ -45,6 +45,14 @@ model Event {
   rsvpDeadline   DateTime?
   rsvpContact    String
 
+  // Textos do convite
+  invitationHeader   String?   @default("Com a Bênção de Deus")
+  invitationIntro    String?   @default("Temos a alegria de vos convidar para o nosso casamento")
+  invitationRomantic String?   @default("Duas vidas, dois corações, uma história para toda a vida.")
+  invitationHonor    String?   @default("Será uma honra celebrar este momento tão especial na presença de vocês.")
+  invitationFooter   String?   @default("Juntos para sempre")
+  invitationValues   String?   @default("Amor · Respeito · Companheirismo · Sempre")
+
   // Template
   templateSlug       String    @default("magnolia-gold")
   themeSlug          String    @default("dourado")
