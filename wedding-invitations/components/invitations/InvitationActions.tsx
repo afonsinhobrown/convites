@@ -121,31 +121,6 @@ export function InvitationActions({
             </button>
           </div>
 
-          {/* e-Mola */}
-          <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#FDFBF7] p-3 text-sm">
-            <div>
-              <p className="font-semibold text-amber-600">e-Mola</p>
-              <p className="text-xs text-gray-600 font-mono">+258 86 123 4567</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => copyToClipboard("+258 86 123 4567", "emola")}
-              className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900"
-            >
-              {copiedType === "emola" ? (
-                <>
-                  <Check className="h-3.5 w-3.5 text-emerald-600" />
-                  <span className="text-emerald-600">Copiado</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5" />
-                  <span>Copiar</span>
-                </>
-              )}
-            </button>
-          </div>
-
           {/* Millennium BIM / Conta Bancária */}
           <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#FDFBF7] p-3 text-sm">
             <div>
