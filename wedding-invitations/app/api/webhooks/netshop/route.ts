@@ -20,18 +20,18 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let body: any;
+  let body: Record<string, unknown>;
   try {
     body = JSON.parse(raw);
   } catch {
     return NextResponse.json({ received: true, error: "invalid json" }, { status: 400 });
   }
 
-  const event = body.event || body.type;
-  const data = body.data || body;
+  const event = String(body.event || body.type || "");
+  const data = (body.data || body) as Record<string, unknown>;
 
   if (event === "charge.paid" || data.status === "paid" || data.status === "succeeded") {
-    const reference = data.reference;
+    const reference = typeof data.reference === "string" ? data.reference : undefined;
     if (reference) {
       // 1. Pagamento de Template (TPL_...)
       if (reference.startsWith("TPL_")) {
