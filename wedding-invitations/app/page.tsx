@@ -175,7 +175,7 @@ async function Gallery() {
 
             <div className="mt-3">
               <h2 className="text-sm font-semibold text-gray-900">{t.name}</h2>
-              <p className="mt-1 text-sm font-medium text-[#C5A059]">
+              <p className="mt-1 text-sm font-medium text-[#C5A059]" suppressHydrationWarning>
                 {mzn.toLocaleString("pt-PT")} MT
               </p>
               <p className="mt-1 text-xs font-medium text-gray-400 group-hover:text-[#C5A059] transition">

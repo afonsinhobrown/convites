@@ -100,7 +100,7 @@ export default async function TemplatePage({ params }: { params: { slug: string 
             {/* Preço */}
             <div className="rounded-2xl border border-[#C5A059]/30 bg-white p-5 shadow-sm">
               <p className="text-sm text-gray-500">Preço do modelo</p>
-              <p className="mt-1 text-3xl font-bold text-[#1A1A1A]">
+              <p className="mt-1 text-3xl font-bold text-[#1A1A1A]" suppressHydrationWarning>
                 {mzn.toLocaleString("pt-PT")} MT
               </p>
               <p className="text-sm text-gray-400">≈ US$ {usd}</p>

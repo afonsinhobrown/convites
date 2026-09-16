@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CANVAS,
   fontFamilyClass,
@@ -57,7 +57,7 @@ export function LayoutFromJson({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const update = () => setScale(el.clientWidth / CANVAS.width);
@@ -68,7 +68,11 @@ export function LayoutFromJson({
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full aspect-[2/3] overflow-hidden rounded-lg">
+    <div
+      ref={containerRef}
+      suppressHydrationWarning
+      className="relative w-full aspect-[2/3] overflow-hidden rounded-lg"
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={previewUrl ?? "/templates/magnolia-classica/fundo.png"}
@@ -76,6 +80,7 @@ export function LayoutFromJson({
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div
+        suppressHydrationWarning
         className="absolute left-0 top-0"
         style={{
           width: CANVAS.width,
