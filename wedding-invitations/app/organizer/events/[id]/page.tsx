@@ -5,7 +5,7 @@ import { getCurrentOrganizerId } from "@/lib/session";
 import { formatEventDate, getBaseUrl, eventToInvitationData } from "@/lib/invitation";
 import { getSystemConfig } from "@/lib/config";
 import { ArrowLeft } from "lucide-react";
-import { TemplatePicker } from "./TemplatePicker";
+import { TemplatePreview } from "@/components/invitations/TemplatePreview";
 import { GuestForm } from "./GuestForm";
 import { CouplePhotos } from "./CouplePhotos";
 import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
@@ -141,17 +141,34 @@ export default async function EditEventPage({ params }: { params: { id: string }
       </header>
 
       <div className="mx-auto max-w-5xl space-y-10 px-4 py-8">
+        {/* O seu Convite Pago e Personalizado */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">Modelo do seu convite</h2>
-            <p className="text-xs text-gray-500">Pré-visualização com os dados reais do casal</p>
+            <h2 className="text-lg font-semibold text-gray-900">
+              O seu convite ({currentTemplate?.name ?? "Modelo Pago"})
+            </h2>
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              ✓ Modelo Pago &amp; Ativo
+            </span>
           </div>
-          <TemplatePicker
-            eventId={event.id}
-            currentSlug={event.templateSlug}
-            templates={templates}
-            eventData={eventData}
-          />
+
+          <div className="max-w-[280px] rounded-2xl border-2 border-[#C5A059] bg-white p-3 shadow-md">
+            {currentTemplate && (
+              <TemplatePreview
+                slug={currentTemplate.slug}
+                name={currentTemplate.name}
+                componentName={currentTemplate.componentName}
+                previewUrl={currentTemplate.previewUrl}
+                layoutJson={currentTemplate.layoutJson}
+                demoData={currentTemplate.demoData}
+                customData={eventData}
+                className="aspect-[2/3]"
+              />
+            )}
+            <p className="mt-2 text-center text-xs font-medium text-gray-700">
+              {currentTemplate?.name}
+            </p>
+          </div>
         </section>
 
         <section>
