@@ -18,6 +18,7 @@ export interface InvitationData {
   mes1?: string;
   ano1?: string;
   hora1?: string;
+  data_completa?: string;
   venue: string;
   address: string;
   locationName?: string;

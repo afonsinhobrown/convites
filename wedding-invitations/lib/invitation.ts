@@ -78,6 +78,7 @@ export function eventToInvitationData(event: Event): InvitationData {
     mes1: String(d.getMonth() + 1).padStart(2, "0") || "02",
     ano1: String(d.getFullYear()).slice(-2) || "27",
     hora1: event.ceremonyTime ? (event.ceremonyTime.includes("h") ? event.ceremonyTime : event.ceremonyTime.replace(":", "h")) : "14h00",
+    data_completa: `${day}/${String(d.getMonth() + 1).padStart(2, "0")}/${year}`,
     locationName: event.ceremonyVenue ?? "",
     locationAddress: event.ceremonyAddress ?? "",
     venue: event.ceremonyVenue ?? "",

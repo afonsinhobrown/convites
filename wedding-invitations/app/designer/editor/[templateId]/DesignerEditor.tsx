@@ -37,6 +37,7 @@ const SAMPLE_DATA = {
   mes1: "02",
   ano1: "27",
   hora1: "14h00",
+  data_completa: "08/09/2027",
   venue: "Mesquita Al-Iman",
   address: "RUA DA BEIRA, MAPUTO",
   locationName: "Mesquita Al-Iman",
