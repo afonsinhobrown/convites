@@ -17,9 +17,11 @@ import {
   CheckCircle2,
   Loader2,
   Lock,
+  MessageCircle,
 } from "lucide-react";
 import { InvitationRenderer } from "@/components/invitations/InvitationRenderer";
 import type { InvitationData } from "@/components/invitations/types";
+import { WhatsAppModal } from "./WhatsAppModal";
 
 export interface InviteGuest {
   id: string;
@@ -79,6 +81,7 @@ export function InvitesPanel({
   const [feeSuccess, setFeeSuccess] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
   const [generating, setGenerating] = useState<"for_print" | "for_guest" | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -303,13 +306,33 @@ export function InvitesPanel({
                 setFeeModalOpen(true);
                 return;
               }
+              setWhatsAppModalOpen(true);
+            }}
+            disabled={guests.length === 0}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition ${
+              guestFeePaid
+                ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm"
+                : "border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+            } disabled:cursor-not-allowed disabled:opacity-60`}
+            title={guestFeePaid ? "Enviar convites via WhatsApp" : "Pague a taxa para enviar convites"}
+          >
+            {guestFeePaid ? <MessageCircle className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            Enviar WhatsApp
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!guestFeePaid) {
+                setFeeModalOpen(true);
+                return;
+              }
               setModalOpen(true);
               setModalError(null);
               setSuccess(null);
             }}
             disabled={guests.length === 0}
             className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition ${
-              guestFeePaid ? "bg-emerald-600 hover:bg-emerald-700" : "bg-[#C5A059] hover:bg-[#b08f4a]"
+              guestFeePaid ? "bg-[#C5A059] hover:bg-[#b08f4a]" : "bg-[#C5A059] hover:bg-[#b08f4a]"
             } disabled:cursor-not-allowed disabled:opacity-60`}
           >
             {guestFeePaid ? <Sparkles className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
@@ -641,6 +664,21 @@ export function InvitesPanel({
           </div>
         </div>
       )}
+
+      {/* Modal de Envio via WhatsApp */}
+      <WhatsAppModal
+        isOpen={whatsAppModalOpen}
+        onClose={() => setWhatsAppModalOpen(false)}
+        eventId={eventId}
+        guests={guests}
+        eventData={{
+          brideName: eventData.brideName,
+          groomName: eventData.groomName,
+          weddingDateFormatted: `${eventData.day} de ${eventData.month} de ${eventData.year}`,
+          ceremonyVenue: eventData.venue,
+          ceremonyTime: eventData.time,
+        }}
+      />
     </div>
   );
 }

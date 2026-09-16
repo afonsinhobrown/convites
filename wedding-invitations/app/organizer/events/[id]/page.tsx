@@ -11,6 +11,7 @@ import { CouplePhotos } from "./CouplePhotos";
 import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
 import { EventDetailsEditor } from "./EventDetailsEditor";
 import { EventPendingPayment } from "./EventPendingPayment";
+import { ReportsSection } from "./ReportsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -18,15 +19,19 @@ export default async function EditEventPage({ params }: { params: { id: string }
   const organizerId = await getCurrentOrganizerId();
   if (!organizerId) redirect("/organizer/login");
 
-  const [event, templates, guests, config] = await Promise.all([
-    prisma.event.findFirst({ where: { id: params.id, organizerId } }),
-    prisma.invitationTemplate.findMany({ orderBy: { sortOrder: "asc" } }),
-    prisma.guest.findMany({
-      where: { eventId: params.id },
-      orderBy: { createdAt: "asc" },
-    }),
-    getSystemConfig(),
-  ]);
+  const [event, templates, guests, config, messagesCount, giftsCount, whatsAppLogsCount] =
+    await Promise.all([
+      prisma.event.findFirst({ where: { id: params.id, organizerId } }),
+      prisma.invitationTemplate.findMany({ orderBy: { sortOrder: "asc" } }),
+      prisma.guest.findMany({
+        where: { eventId: params.id },
+        orderBy: { createdAt: "asc" },
+      }),
+      getSystemConfig(),
+      prisma.message.count({ where: { eventId: params.id } }),
+      prisma.gift.count({ where: { eventId: params.id } }),
+      prisma.whatsAppLog.count({ where: { eventId: params.id } }),
+    ]);
 
   if (!event) notFound();
 
@@ -158,6 +163,20 @@ export default async function EditEventPage({ params }: { params: { id: string }
               }}
             />
           </div>
+        </section>
+
+        {/* Relatórios Oficiais em PDF */}
+        <section>
+          <ReportsSection
+            eventId={event.id}
+            counts={{
+              guests: guests.length,
+              confirmed: guests.filter((g) => g.rsvpStatus === "CONFIRMED").length,
+              messages: messagesCount,
+              gifts: giftsCount,
+              whatsAppLogs: whatsAppLogsCount,
+            }}
+          />
         </section>
       </div>
     </main>

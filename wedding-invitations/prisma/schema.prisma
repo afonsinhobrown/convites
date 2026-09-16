@@ -81,6 +81,7 @@ model Event {
   photos   Photo[]
   gifts    Gift[]
   messages Message[]
+  whatsAppLogs WhatsAppLog[]
 
   @@index([organizerId])
 }
@@ -272,4 +273,19 @@ enum PaymentStatus {
   PAID
   FAILED
   CANCELLED
+}
+
+model WhatsAppLog {
+  id             String   @id @default(uuid())
+  eventId        String
+  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  guestId        String?
+  recipientName  String
+  recipientPhone String
+  mode           String   @default("INDIVIDUAL") // "INDIVIDUAL" | "BULK"
+  status         String   @default("SENT") // "SENT" | "PENDING"
+  messageText    String   @db.Text
+  sentAt         DateTime @default(now())
+
+  @@index([eventId])
 }
