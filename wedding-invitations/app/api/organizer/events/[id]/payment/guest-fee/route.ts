@@ -43,7 +43,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const isSandboxActive = Boolean(body.isSandbox) && (config.sandboxEnabled ?? true);
     const totalMzn = isSandboxActive ? 10 : guestCount * feePerGuestMzn;
     const description = isSandboxActive ? "doremi modo sandbox" : undefined;
-    const reference = isSandboxActive ? `GFEE_SANDBOX_${event.id}_${Date.now()}` : `GFEE_${event.id}_${Date.now()}`;
+    const shortId = event.id.replace(/-/g, "").slice(0, 8);
+    const timeSuffix = Date.now().toString().slice(-6);
+    const reference = isSandboxActive ? `GF_SB_${shortId}_${timeSuffix}` : `GF_${shortId}_${timeSuffix}`;
 
     const origin = request.headers.get("origin") || request.headers.get("referer") || "https://convites-beta.vercel.app";
     const returnUrl = `${origin}/organizer/events/${event.id}?gfee_paid=1`;
@@ -97,7 +99,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
   } catch (error) {
     console.error("Erro ao iniciar pagamento da taxa de convidados na NetShop:", error);
     const msg = error instanceof Error ? error.message : "Erro ao processar pagamento";
-    return NextResponse.json({ error: msg }, { status: 400 });
+    const friendlyMsg =
+      msg.toLowerCase().includes("validation") ||
+      msg.toLowerCase().includes("invalido") ||
+      msg.toLowerCase().includes("invalid")
+        ? "Erro de validação nos dados de pagamento. Por favor confirme se o número é Vodacom válido (84/85)."
+        : msg;
+    return NextResponse.json({ error: friendlyMsg }, { status: 400 });
   }
 }
 

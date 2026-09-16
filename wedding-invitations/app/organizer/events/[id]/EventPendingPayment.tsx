@@ -38,14 +38,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
   const [method, setMethod] = useState<"mpesa" | "card">("mpesa");
   const [isSandbox, setIsSandbox] = useState(false);
 
-  // Só pré-preenche se o contacto do evento for Vodacom (84 ou 85), senão deixa em branco
-  const initialPhone = (() => {
-    const clean = (event.rsvpContact || "").replace(/\D/g, "");
-    const local = clean.startsWith("258") ? clean.slice(3) : clean;
-    return local.startsWith("84") || local.startsWith("85") ? local.slice(0, 9) : "";
-  })();
-
-  const [phone, setPhone] = useState(initialPhone);
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -90,7 +83,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
         return;
       }
       if (localDigits.length !== 9) {
-        setError("O número de telefone deve ter exatamente 9 dígitos (ex: 847981166).");
+        setError("O número de telefone deve ter exatamente 9 dígitos (ex: 84 123 4567).");
         return;
       }
       cleanMsisdn = `258${localDigits}`;
@@ -108,7 +101,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao processar pagamento na NetShop");
+        throw new Error(data.error || "Não foi possível iniciar o pagamento. Por favor tente novamente.");
       }
 
       if (data.paid) {
@@ -355,12 +348,12 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
                           }
                           setPhone(val.slice(0, 9));
                         }}
-                        placeholder="847981166"
+                        placeholder="841234567"
                         className="block w-full rounded-r-lg border border-gray-300 px-3.5 py-2.5 text-base font-medium tracking-wider focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
                       />
                     </div>
                     <p className="mt-1 text-[11px] text-gray-500">
-                      Introduza apenas os 9 dígitos (ex: 847981166). O prefixo +258 é adicionado automaticamente.
+                      Introduza apenas os 9 dígitos (ex: 84 123 4567). O prefixo +258 é adicionado automaticamente.
                     </p>
                   </div>
                 ) : (

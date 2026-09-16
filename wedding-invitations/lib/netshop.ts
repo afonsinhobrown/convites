@@ -66,17 +66,18 @@ export async function createNetShopCharge(params: {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "X-Wallet-ID": walletId,
-      "Idempotency-Key": `conv_${params.reference}_${Date.now()}`,
+      "Idempotency-Key": `idemp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify(payload),
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.error || data.detail || JSON.stringify(data));
+    const errorMsg = data?.message || data?.error || data?.detail || (typeof data === "string" ? data : "validation_error");
+    throw new Error(typeof errorMsg === "string" ? errorMsg : JSON.stringify(errorMsg));
   }
 
   const checkoutUrl = data.checkout?.hosted_url;

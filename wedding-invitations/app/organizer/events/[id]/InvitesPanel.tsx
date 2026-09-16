@@ -67,15 +67,8 @@ export function InvitesPanel({
   // Estados da taxa de convidados
   const [feeModalOpen, setFeeModalOpen] = useState(false);
   const [isSandboxFee, setIsSandboxFee] = useState(false);
-  // Só pré-preenche se o contacto for Vodacom 84/85
-  const initialFeePhone = (() => {
-    const clean = (eventData.rsvpContact || "").replace(/\D/g, "");
-    const local = clean.startsWith("258") ? clean.slice(3) : clean;
-    return local.startsWith("84") || local.startsWith("85") ? `+258${local}` : "";
-  })();
-
   const [feeMethod, setFeeMethod] = useState<"mpesa" | "card">("mpesa");
-  const [feePhone, setFeePhone] = useState(initialFeePhone);
+  const [feePhone, setFeePhone] = useState("");
   const [feeLoading, setFeeLoading] = useState(false);
   const [feeError, setFeeError] = useState<string | null>(null);
   const [feeSuccess, setFeeSuccess] = useState<string | null>(null);
@@ -125,7 +118,7 @@ export function InvitesPanel({
         return;
       }
       if (localDigits.length !== 9) {
-        setFeeError("O número de telefone deve ter exatamente 9 dígitos (ex: 847981166).");
+        setFeeError("O número de telefone deve ter exatamente 9 dígitos (ex: 84 123 4567).");
         return;
       }
       cleanMsisdn = `258${localDigits}`;
@@ -395,8 +388,8 @@ export function InvitesPanel({
                           setGuests((prev) => prev.filter((item) => item.id !== g.id));
                           router.refresh();
                         }
-                      } catch (err) {
-                        console.error("Erro ao remover:", err);
+                      } catch {
+                        // silencioso
                       }
                     }}
                     className="p-1 text-gray-400 hover:text-red-600 transition"
@@ -612,7 +605,7 @@ export function InvitesPanel({
                         }
                         setFeePhone(val.slice(0, 9));
                       }}
-                      placeholder="847981166"
+                      placeholder="841234567"
                       className="block w-full rounded-r-lg border border-gray-300 px-3 py-2 text-sm font-medium tracking-wider focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
                     />
                   </div>

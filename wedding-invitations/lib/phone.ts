@@ -48,11 +48,11 @@ export function normalizeMozPhone(phone: string | null | undefined): string | nu
  * "25884XXXXXXX" ou "25885XXXXXXX" (12 dígitos, sem espaços nem símbolos)
  *
  * Suporta todas as entradas:
- * - "847981166" -> "258847981166"
- * - "+258847981166" -> "258847981166"
- * - "+258 84 798 1166" -> "258847981166"
+ * - "841234567" -> "258841234567"
+ * - "+258841234567" -> "258841234567"
+ * - "+258 84 123 4567" -> "258841234567"
  * - "258 85 123 4567" -> "258851234567"
- * - "00258847981166" -> "258847981166"
+ * - "00258841234567" -> "258841234567"
  */
 export function toMozMsisdn(phone: string | null | undefined): string | null {
   if (!phone) return null;
