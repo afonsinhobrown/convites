@@ -1,8 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, Link2, Sparkles, FileDown, Download, Printer, Users, Trash2 } from "lucide-react";
+import {
+  X,
+  Link2,
+  Sparkles,
+  FileDown,
+  Download,
+  Printer,
+  Users,
+  Trash2,
+  CreditCard,
+  Smartphone,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  Lock,
+} from "lucide-react";
 import { InvitationRenderer } from "@/components/invitations/InvitationRenderer";
 import type { InvitationData } from "@/components/invitations/types";
 
@@ -29,11 +44,15 @@ export function InvitesPanel({
   initialGuests,
   eventData,
   template,
+  guestFeePaid = false,
+  guestFeeCents = 2500,
 }: {
   eventId: string;
   initialGuests: InviteGuest[];
   eventData: InvitationData;
   template: TemplateInfo;
+  guestFeePaid?: boolean;
+  guestFeeCents?: number;
 }) {
   const router = useRouter();
   const [guests, setGuests] = useState<InviteGuest[]>(initialGuests);
@@ -41,10 +60,74 @@ export function InvitesPanel({
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Estados da taxa de convidados
+  const [feeModalOpen, setFeeModalOpen] = useState(false);
+  const [feeMethod, setFeeMethod] = useState<"mpesa" | "card">("mpesa");
+  const [feePhone, setFeePhone] = useState(eventData.rsvpContact || "");
+  const [feeLoading, setFeeLoading] = useState(false);
+  const [feeError, setFeeError] = useState<string | null>(null);
+  const [feeSuccess, setFeeSuccess] = useState<string | null>(null);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [generating, setGenerating] = useState<"for_print" | "for_guest" | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const feePerGuest = Math.round(guestFeeCents / 100);
+  const totalFeeMzn = guests.length * feePerGuest;
+
+  // Polling para pagamento da taxa de convidados
+  useEffect(() => {
+    if (guestFeePaid) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`);
+        const data = await res.json();
+        if (data.paid) {
+          router.refresh();
+        }
+      } catch {
+        // silencioso
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [eventId, guestFeePaid, router]);
+
+  async function handlePayGuestFee(e: React.FormEvent) {
+    e.preventDefault();
+    setFeeLoading(true);
+    setFeeError(null);
+    setFeeSuccess(null);
+
+    try {
+      const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: feeMethod, phone: feePhone }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao processar pagamento");
+      }
+
+      if (data.paid) {
+        setFeeModalOpen(false);
+        router.refresh();
+        return;
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setFeeSuccess("Pedido enviado para o seu telefone. Confirme com o PIN no M-Pesa.");
+      }
+    } catch (err) {
+      setFeeError(err instanceof Error ? err.message : "Erro ao processar pagamento");
+    } finally {
+      setFeeLoading(false);
+    }
+  }
 
   async function generateLinks() {
     setLoading(true);
@@ -130,29 +213,77 @@ export function InvitesPanel({
 
   return (
     <div className="space-y-4 rounded-2xl border border-[#C5A059]/20 bg-white p-5 shadow-sm">
+      {/* Banner da Taxa de Convidados */}
+      {!guestFeePaid ? (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-bold text-amber-900">
+                  Taxa de Convidados Pendente
+                </h4>
+                <p className="text-xs text-amber-800 mt-0.5">
+                  Taxa obrigatória: <strong>{feePerGuest} MT</strong> por convidado (Total: <strong>{totalFeeMzn} MT</strong> para {guests.length} convidados).
+                </p>
+              </div>
+            </div>
+            {guests.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setFeeModalOpen(true)}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#C5A059] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#b08f4a] transition whitespace-nowrap"
+              >
+                Pagar Taxa ({totalFeeMzn} MT) →
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-medium text-emerald-800">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+            <span>Taxa de convidados liquidada ({feePerGuest} MT / convidado)</span>
+          </div>
+          <span className="text-xs font-semibold text-emerald-700">{guests.length} convidados activos</span>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-gray-900">Convidados ({guests.length})</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={generateLinks}
+            onClick={guestFeePaid ? generateLinks : () => setFeeModalOpen(true)}
             disabled={loading || guests.length === 0}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
+              guestFeePaid
+                ? "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                : "border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+            } disabled:cursor-not-allowed disabled:opacity-60`}
+            title={guestFeePaid ? "Gerar links" : "Pague a taxa de convidados para gerar links"}
           >
-            <Link2 className="h-4 w-4" />
+            {guestFeePaid ? <Link2 className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
             {loading ? "A gerar..." : "Gerar links"}
           </button>
           <button
             type="button"
             onClick={() => {
+              if (!guestFeePaid) {
+                setFeeModalOpen(true);
+                return;
+              }
               setModalOpen(true);
               setModalError(null);
               setSuccess(null);
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+            disabled={guests.length === 0}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition ${
+              guestFeePaid ? "bg-emerald-600 hover:bg-emerald-700" : "bg-[#C5A059] hover:bg-[#b08f4a]"
+            } disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            <Sparkles className="h-4 w-4" />
-            Gerar convites
+            {guestFeePaid ? <Sparkles className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            {guestFeePaid ? "Gerar convites" : "Pagar taxa para gerar"}
           </button>
         </div>
       </div>
@@ -332,6 +463,126 @@ export function InvitesPanel({
             <p className="mt-4 text-center text-xs text-gray-400">
               A geração é feita no servidor; o download começa automaticamente quando estiver pronto.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Pagamento da Taxa de Convidados via NetShop */}
+      {feeModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Taxa de Emissão de Convites</h3>
+                <p className="text-xs text-gray-500">Pagamento oficial via NetShop</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeeModalOpen(false)}
+                className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100"
+                aria-label="Fechar"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-4 rounded-xl bg-[#FDFBF7] p-4 border border-[#C5A059]/20">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Total de convidados:</span>
+                <span className="font-semibold text-gray-900">{guests.length}</span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-gray-600">Preço por convite:</span>
+                <span className="font-semibold text-gray-900">{feePerGuest} MT</span>
+              </div>
+              <div className="flex justify-between text-base font-bold text-gray-900 border-t border-gray-200 mt-3 pt-2">
+                <span>Total a pagar:</span>
+                <span className="text-[#C5A059]">{totalFeeMzn} MT</span>
+              </div>
+            </div>
+
+            <form onSubmit={handlePayGuestFee} className="mt-5 space-y-4">
+              {/* Seleção do Método */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFeeMethod("mpesa")}
+                  className={`flex flex-col items-center justify-center rounded-xl border p-3 text-center transition ${
+                    feeMethod === "mpesa"
+                      ? "border-red-600 bg-red-50 text-red-700 font-semibold"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <Smartphone className="h-4 w-4 mb-1 text-red-600" />
+                  <span className="text-xs">M-Pesa</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFeeMethod("card")}
+                  className={`flex flex-col items-center justify-center rounded-xl border p-3 text-center transition ${
+                    feeMethod === "card"
+                      ? "border-[#8B5A2B] bg-[#8B5A2B]/10 text-[#8B5A2B] font-semibold"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <CreditCard className="h-4 w-4 mb-1 text-[#8B5A2B]" />
+                  <span className="text-xs">BIM / Cartão</span>
+                </button>
+              </div>
+
+              {feeMethod === "mpesa" && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Número M-Pesa (Vodacom)
+                  </label>
+                  <div className="mt-1 flex rounded-lg shadow-sm">
+                    <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 text-xs text-gray-500">
+                      +258
+                    </span>
+                    <input
+                      type="tel"
+                      required
+                      value={feePhone.replace(/^\+?258/, "")}
+                      onChange={(e) => setFeePhone(`+258${e.target.value.replace(/\D/g, "")}`)}
+                      placeholder="841234567"
+                      className="block w-full rounded-r-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {feeError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-700">
+                  {feeError}
+                </div>
+              )}
+
+              {feeSuccess && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800">
+                  {feeSuccess}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={feeLoading || guests.length === 0}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#C5A059] px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-[#b08f4a] transition disabled:opacity-50"
+              >
+                {feeLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    A processar...
+                  </>
+                ) : (
+                  <>Pagar {totalFeeMzn} MT agora →</>
+                )}
+              </button>
+            </form>
           </div>
         </div>
       )}

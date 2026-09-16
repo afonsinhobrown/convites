@@ -40,7 +40,14 @@ export async function POST(
     }
 
     if (!event.templatePaidAt) {
-      return NextResponse.json({ error: "Evento aguarda pagamento" }, { status: 402 });
+      return NextResponse.json({ error: "Evento aguarda pagamento do template" }, { status: 402 });
+    }
+
+    if (!event.guestFeePaidAt) {
+      return NextResponse.json(
+        { error: "A taxa de convidados (25 MT por convidado) deve ser paga antes de descarregar os convites." },
+        { status: 402 }
+      );
     }
 
     const body = await request.json().catch(() => ({}));

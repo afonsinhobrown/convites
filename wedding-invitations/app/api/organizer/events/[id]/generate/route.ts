@@ -19,7 +19,14 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     if (!existing.templatePaidAt) {
-      return NextResponse.json({ error: "Evento aguarda pagamento" }, { status: 402 });
+      return NextResponse.json({ error: "Evento aguarda pagamento do template" }, { status: 402 });
+    }
+
+    if (!existing.guestFeePaidAt) {
+      return NextResponse.json(
+        { error: "A taxa de convidados (25 MT por convidado) deve ser paga antes de gerar as ligações." },
+        { status: 402 }
+      );
     }
 
     const guests = await prisma.guest.findMany({

@@ -147,6 +147,8 @@ export default async function EditEventPage({ params }: { params: { id: string }
               eventId={event.id}
               initialGuests={inviteGuests}
               eventData={eventData}
+              guestFeePaid={!!event.guestFeePaidAt}
+              guestFeeCents={event.guestFeeCents || 2500}
               template={{
                 layout: currentTemplate?.componentName ?? event.templateSlug,
                 layoutJson: currentTemplate?.layoutJson ?? null,
