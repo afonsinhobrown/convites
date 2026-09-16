@@ -14,6 +14,10 @@ export interface InvitationData {
   month: string;
   year: string;
   time: string;
+  dia1?: string;
+  mes1?: string;
+  ano1?: string;
+  hora1?: string;
   venue: string;
   address: string;
   locationName?: string;

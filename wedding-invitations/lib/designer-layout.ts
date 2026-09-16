@@ -39,6 +39,10 @@ export const FIELD_ORDER = {
   month: "Mês",
   year: "Ano",
   time: "Hora",
+  dia1: "Dia (01)",
+  mes1: "Mês (02)",
+  ano1: "Ano (27)",
+  hora1: "Hora (14h00)",
   invitationRomantic: "Frase romântica",
   locationName: "Nome do local",
   locationAddress: "Morada do local",
@@ -365,12 +369,20 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.groomName ?? "";
     case "day":
       return data.day ?? "";
+    case "dia1":
+      return data.dia1 || "01";
     case "month":
       return `DE ${data.month ?? ""}`;
+    case "mes1":
+      return data.mes1 || "02";
     case "year":
       return `DE ${data.year ?? ""}`;
+    case "ano1":
+      return data.ano1 || "27";
     case "time":
       return data.time ?? "";
+    case "hora1":
+      return data.hora1 || "14h00";
     case "locationName":
       return data.locationName ?? data.venue ?? "";
     case "locationAddress":
@@ -412,6 +424,10 @@ export type InvitationFieldData = {
   month: string;
   year: string;
   time: string;
+  dia1?: string;
+  mes1?: string;
+  ano1?: string;
+  hora1?: string;
   venue: string;
   address: string;
   rsvpContact: string;
