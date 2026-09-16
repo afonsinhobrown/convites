@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
+import { uploadImageBufferToCloudinary } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
 
@@ -51,17 +52,26 @@ export async function POST(
         );
       }
 
-      const dir = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        "events",
-        params.id
-      );
-      await mkdir(dir, { recursive: true });
-      await writeFile(path.join(dir, name), bytes);
+      // Tenta upload para Cloudinary CDN
+      let photoUrl = `/uploads/events/${params.id}/${name}`;
+      try {
+        const uploadRes = await uploadImageBufferToCloudinary(bytes, `events/${params.id}`, field);
+        if (uploadRes?.secure_url) {
+          photoUrl = uploadRes.secure_url;
+        }
+      } catch (cdnErr) {
+        console.warn("Cloudinary event photo fallback:", cdnErr);
+      }
 
-      updates[field] = `/uploads/events/${params.id}/${name}`;
+      try {
+        const dir = path.join(process.cwd(), "public", "uploads", "events", params.id);
+        await mkdir(dir, { recursive: true });
+        await writeFile(path.join(dir, name), bytes);
+      } catch {
+        // Vercel serverless filesystem read-only fallback
+      }
+
+      updates[field] = photoUrl;
       uploaded++;
     }
 

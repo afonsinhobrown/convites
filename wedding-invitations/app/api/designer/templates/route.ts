@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import { prisma } from "@/lib/prisma";
 import { DESIGNER_COOKIE_NAME, verifyDesignerSessionToken } from "@/lib/designer-auth";
 import { DEMO_DATA } from "@/lib/demo-data";
+import { uploadImageBufferToCloudinary } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
 
@@ -75,11 +76,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Formato inválido. Apenas PNG, JPG ou WEBP são suportados." }, { status: 400 });
     }
 
-    // 5. Gerar Data URI em Base64 (Compatível com Vercel Serverless e Neon DB)
+    // 5. Upload para Cloudinary CDN (com fallback para Data URI e disco local)
     const mimeType = file.type || "image/png";
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const base64Data = fileBuffer.toString("base64");
-    const previewUrl = `data:${mimeType};base64,${base64Data}`;
+    let previewUrl = `data:${mimeType};base64,${base64Data}`;
+
+    try {
+      const uploadRes = await uploadImageBufferToCloudinary(fileBuffer, "templates", slug);
+      if (uploadRes?.secure_url) {
+        previewUrl = uploadRes.secure_url;
+      }
+    } catch (cdnErr) {
+      console.warn("Cloudinary CDN fallback:", cdnErr);
+    }
 
     // Tenta guardar no disco local se o sistema de ficheiros for gravável (ex: desenvolvimento)
     try {
@@ -91,7 +101,7 @@ export async function POST(request: Request) {
       const filePath = path.join(templatesDir, filename);
       await fs.writeFile(filePath, fileBuffer);
     } catch {
-      // Em Vercel Serverless (/var/task é read-only), o Data URI no banco de dados assegura 100% do funcionamento
+      // Em Vercel Serverless (/var/task é read-only), o URL Cloudinary ou Data URI assegura 100% de persistência
     }
 
     // 6. Gerar componentName em PascalCase
