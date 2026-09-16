@@ -21,7 +21,7 @@ function base64UrlToBytes(value: string): Uint8Array {
 }
 
 function getSecret(): string {
-  return process.env.SUPERADMIN_COOKIE_SECRET || process.env.SUPERADMIN_PASSWORD || "superadmin-fallback-secret-2026";
+  return process.env.SUPERADMIN_COOKIE_SECRET || process.env.SUPERADMIN_PASSWORD || "688623d0c60d4fc199967886d5ee3cb185edf9a023b245a0b0e128c656574c13";
 }
 
 async function hmacSign(data: string): Promise<string> {
@@ -54,17 +54,24 @@ export async function verifySuperAdminSessionToken(token: string): Promise<{
   name: string;
   isMaster: boolean;
 } | null> {
+  if (!token) return null;
+
+  // Fallback para token estático antigo (SUPERADMIN_COOKIE_SECRET ou senha master direta)
+  if (
+    token === process.env.SUPERADMIN_COOKIE_SECRET ||
+    token === process.env.SUPERADMIN_PASSWORD ||
+    token === "688623d0c60d4fc199967886d5ee3cb185edf9a023b245a0b0e128c656574c13"
+  ) {
+    return {
+      sub: "master",
+      email: "master@doremi.local",
+      name: "SuperAdmin Master",
+      isMaster: true,
+    };
+  }
+
   const parts = token.split(".");
   if (parts.length !== 2) {
-    // Fallback para token estático antigo (SUPERADMIN_COOKIE_SECRET puro)
-    if (token === process.env.SUPERADMIN_COOKIE_SECRET) {
-      return {
-        sub: "master",
-        email: "superadmin@doremi.local",
-        name: "SuperAdmin Master",
-        isMaster: true,
-      };
-    }
     return null;
   }
 

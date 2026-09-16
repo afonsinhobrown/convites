@@ -4,6 +4,7 @@ import {
   verifyOrganizerSessionToken,
 } from "@/lib/organizer-auth";
 import { DESIGNER_COOKIE_NAME, verifyDesignerSessionToken } from "@/lib/designer-auth";
+import { SUPERADMIN_COOKIE_NAME, verifySuperAdminSessionToken } from "@/lib/superadmin-auth";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -40,8 +41,9 @@ export async function middleware(request: NextRequest) {
 
   if (isSuperadminRoute) {
     if (superadminPublicPaths.includes(pathname)) return NextResponse.next();
-    const token = request.cookies.get("superadmin_token")?.value;
-    if (token !== process.env.SUPERADMIN_COOKIE_SECRET) {
+    const token = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value;
+    const admin = token ? await verifySuperAdminSessionToken(token) : null;
+    if (!admin) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
       }
