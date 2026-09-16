@@ -1,11 +1,11 @@
 import { InvitationRenderer } from "@/components/invitations/InvitationRenderer";
-import type { InvitationMode } from "@/components/invitations/types";
+import type { InvitationData, InvitationMode } from "@/components/invitations/types";
 import { TemplateThumbnail } from "@/components/templates/TemplateThumbnail";
 import { demoDataToInvitationData } from "@/lib/demo-data";
 import type { LayoutJson } from "@/lib/designer-layout";
 
-// Preview de um template na montra/selector. Usa os dados fictícios
-// (demoData) quando existem; caso contrário cai no thumbnail estático.
+// Preview de um template na montra/selector. Usa os dados reais do evento quando
+// fornecidos (customData), senão dados fictícios (demoData), e em fallback thumbnail.
 export function TemplatePreview({
   slug,
   name,
@@ -13,6 +13,7 @@ export function TemplatePreview({
   previewUrl,
   layoutJson,
   demoData,
+  customData,
   mode = "preview",
   className = "aspect-[2/3]",
 }: {
@@ -22,10 +23,11 @@ export function TemplatePreview({
   previewUrl?: string | null;
   layoutJson?: unknown;
   demoData?: unknown;
+  customData?: InvitationData;
   mode?: InvitationMode;
   className?: string;
 }) {
-  const data = demoDataToInvitationData(demoData);
+  const data = customData ?? demoDataToInvitationData(demoData);
 
   if (!data) {
     return (

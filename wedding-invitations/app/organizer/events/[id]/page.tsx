@@ -142,8 +142,16 @@ export default async function EditEventPage({ params }: { params: { id: string }
 
       <div className="mx-auto max-w-5xl space-y-10 px-4 py-8">
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-gray-900">Escolher modelo</h2>
-          <TemplatePicker eventId={event.id} currentSlug={event.templateSlug} templates={templates} />
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900">Modelo do seu convite</h2>
+            <p className="text-xs text-gray-500">Pré-visualização com os dados reais do casal</p>
+          </div>
+          <TemplatePicker
+            eventId={event.id}
+            currentSlug={event.templateSlug}
+            templates={templates}
+            eventData={eventData}
+          />
         </section>
 
         <section>

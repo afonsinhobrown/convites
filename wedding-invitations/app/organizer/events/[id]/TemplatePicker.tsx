@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TemplatePreview } from "@/components/invitations/TemplatePreview";
+import type { InvitationData } from "@/components/invitations/types";
 import { Check } from "lucide-react";
 
 interface TemplateOption {
@@ -19,10 +20,12 @@ export function TemplatePicker({
   eventId,
   currentSlug,
   templates,
+  eventData,
 }: {
   eventId: string;
   currentSlug: string;
   templates: TemplateOption[];
+  eventData?: InvitationData;
 }) {
   const [selected, setSelected] = useState(currentSlug);
   const [saving, setSaving] = useState<string | null>(null);
@@ -71,7 +74,7 @@ export function TemplatePicker({
               }`}
             >
               {isSelected && (
-                <span className="absolute right-2 top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#C5A059]">
+                <span className="absolute right-2 top-2 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#C5A059]">
                   <Check className="h-3.5 w-3.5 text-white" />
                 </span>
               )}
@@ -82,6 +85,7 @@ export function TemplatePicker({
                 previewUrl={t.previewUrl}
                 layoutJson={t.layoutJson}
                 demoData={t.demoData}
+                customData={eventData}
                 className="aspect-[2/3]"
               />
               <p className="mt-2 text-sm font-medium text-gray-900">{t.name}</p>
