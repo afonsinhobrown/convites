@@ -75,20 +75,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Formato inválido. Apenas PNG, JPG ou WEBP são suportados." }, { status: 400 });
     }
 
-    // 5. Guardar Imagem em public/templates/[slug]/fundo.png
-    const templatesDir = path.join(process.cwd(), "public", "templates", slug);
-    await fs.mkdir(templatesDir, { recursive: true });
-
-    // Determinar extensão da imagem
-    const isJpg = file.type.toLowerCase().includes("jpeg") || file.type.toLowerCase().includes("jpg");
-    const isWebp = file.type.toLowerCase().includes("webp");
-    const filename = isJpg ? "fundo.jpg" : isWebp ? "fundo.webp" : "fundo.png";
-    const filePath = path.join(templatesDir, filename);
-
+    // 5. Gerar Data URI em Base64 (Compatível com Vercel Serverless e Neon DB)
+    const mimeType = file.type || "image/png";
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, fileBuffer);
+    const base64Data = fileBuffer.toString("base64");
+    const previewUrl = `data:${mimeType};base64,${base64Data}`;
 
-    const previewUrl = `/templates/${slug}/${filename}`;
+    // Tenta guardar no disco local se o sistema de ficheiros for gravável (ex: desenvolvimento)
+    try {
+      const templatesDir = path.join(process.cwd(), "public", "templates", slug);
+      await fs.mkdir(templatesDir, { recursive: true });
+      const isJpg = mimeType.includes("jpeg") || mimeType.includes("jpg");
+      const isWebp = mimeType.includes("webp");
+      const filename = isJpg ? "fundo.jpg" : isWebp ? "fundo.webp" : "fundo.png";
+      const filePath = path.join(templatesDir, filename);
+      await fs.writeFile(filePath, fileBuffer);
+    } catch {
+      // Em Vercel Serverless (/var/task é read-only), o Data URI no banco de dados assegura 100% do funcionamento
+    }
 
     // 6. Gerar componentName em PascalCase
     const componentName =
