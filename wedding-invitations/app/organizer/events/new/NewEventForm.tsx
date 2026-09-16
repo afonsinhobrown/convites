@@ -195,7 +195,7 @@ export function NewEventForm({
                     required
                     value={form.brideName}
                     onChange={(e) => update("brideName", e.target.value)}
-                    placeholder="Ex: JÚLIA"
+                    placeholder="Ex: Ana"
                     className={inputClass}
                   />
                 </div>
@@ -213,7 +213,7 @@ export function NewEventForm({
                     required
                     value={form.groomName}
                     onChange={(e) => update("groomName", e.target.value)}
-                    placeholder="Ex: ANTÓNIO"
+                    placeholder="Ex: Zlatan"
                     className={inputClass}
                   />
                 </div>
@@ -271,7 +271,7 @@ export function NewEventForm({
                     required
                     value={form.ceremonyVenue}
                     onChange={(e) => update("ceremonyVenue", e.target.value)}
-                    placeholder="Ex: Quinta dos Coqueiros / Mesquita"
+                    placeholder="Ex: Quinta dos Coqueiros"
                     className={inputClass}
                   />
                 </div>
