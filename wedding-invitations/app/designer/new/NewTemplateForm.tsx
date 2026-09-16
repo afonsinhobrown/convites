@@ -48,6 +48,61 @@ export function NewTemplateForm() {
     setSlug(slugify(e.target.value));
   }
 
+  async function optimizeTemplateImage(rawFile: File): Promise<File> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(rawFile);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        // Canvas padrão do convite é 800x1200. Max resolução de retina: 1600x2400
+        const MAX_WIDTH = 1600;
+        const MAX_HEIGHT = 2400;
+        let { width, height } = img;
+
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          if (width / height > MAX_WIDTH / MAX_HEIGHT) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          } else {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(rawFile);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(rawFile);
+              return;
+            }
+            const optimized = new File([blob], rawFile.name.replace(/\.[^/.]+$/, "") + ".webp", {
+              type: "image/webp",
+              lastModified: Date.now(),
+            });
+            resolve(optimized);
+          },
+          "image/webp",
+          0.90
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(rawFile);
+      };
+      img.src = objectUrl;
+    });
+  }
+
   function handleFileSelect(selectedFile: File) {
     setError(null);
 
@@ -57,9 +112,9 @@ export function NewTemplateForm() {
       return;
     }
 
-    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+    const maxSizeBytes = 25 * 1024 * 1024; // Permite até 25MB pois otimizamos automaticamente no cliente
     if (selectedFile.size > maxSizeBytes) {
-      setError("Imagem demasiado grande. O tamanho máximo permitido é 5MB.");
+      setError("Imagem demasiado grande. O tamanho máximo permitido é 25MB.");
       return;
     }
 
@@ -125,8 +180,11 @@ export function NewTemplateForm() {
     setLoading(true);
 
     try {
+      // Otimizar e comprimir a imagem no cliente antes de enviar ao servidor (evita HTTP 413 na Vercel)
+      const fileToUpload = await optimizeTemplateImage(file);
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileToUpload);
       formData.append("name", name.trim());
       formData.append("slug", slug.trim());
       formData.append("priceUsd", priceUsd);
