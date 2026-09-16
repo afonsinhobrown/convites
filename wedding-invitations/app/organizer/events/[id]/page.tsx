@@ -80,6 +80,12 @@ export default async function EditEventPage({ params }: { params: { id: string }
                 ceremonyAddress: event.ceremonyAddress,
                 rsvpContact: event.rsvpContact,
                 welcomeMessage: event.welcomeMessage ?? "",
+                invitationHeader: event.invitationHeader ?? "Com a Bênção de Deus",
+                invitationIntro: event.invitationIntro ?? "Temos a alegria de vos convidar para o nosso casamento",
+                invitationRomantic: event.invitationRomantic ?? "Duas vidas, dois corações, uma história para toda a vida.",
+                invitationHonor: event.invitationHonor ?? "Será uma honra celebrar este momento tão especial na presença de vocês.",
+                invitationFooter: event.invitationFooter ?? "Juntos para sempre",
+                invitationValues: event.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre",
               }}
             />
           </div>

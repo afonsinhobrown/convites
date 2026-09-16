@@ -51,6 +51,12 @@ export async function POST(request: Request) {
         rsvpContact,
         welcomeMessage: welcomeMessage || null,
         templateSlug,
+        invitationHeader: body?.invitationHeader ? String(body.invitationHeader).trim() : undefined,
+        invitationIntro: body?.invitationIntro ? String(body.invitationIntro).trim() : undefined,
+        invitationRomantic: body?.invitationRomantic ? String(body.invitationRomantic).trim() : undefined,
+        invitationHonor: body?.invitationHonor ? String(body.invitationHonor).trim() : undefined,
+        invitationFooter: body?.invitationFooter ? String(body.invitationFooter).trim() : undefined,
+        invitationValues: body?.invitationValues ? String(body.invitationValues).trim() : undefined,
       },
     });
 

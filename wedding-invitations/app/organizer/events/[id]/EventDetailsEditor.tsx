@@ -15,6 +15,12 @@ interface EventDataProps {
     ceremonyAddress: string;
     rsvpContact: string;
     welcomeMessage: string;
+    invitationHeader: string;
+    invitationIntro: string;
+    invitationRomantic: string;
+    invitationHonor: string;
+    invitationFooter: string;
+    invitationValues: string;
   };
 }
 
@@ -47,6 +53,12 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
           ceremonyAddress: form.ceremonyAddress,
           rsvpContact: form.rsvpContact,
           welcomeMessage: form.welcomeMessage,
+          invitationHeader: form.invitationHeader,
+          invitationIntro: form.invitationIntro,
+          invitationRomantic: form.invitationRomantic,
+          invitationHonor: form.invitationHonor,
+          invitationFooter: form.invitationFooter,
+          invitationValues: form.invitationValues,
         }),
       });
 
@@ -177,11 +189,86 @@ export function EventDetailsEditor({ eventId, initialData }: EventDataProps) {
           <div>
             <label className="block text-sm font-medium text-gray-700">Mensagem personalizada</label>
             <textarea
-              rows={3}
+              rows={2}
               value={form.welcomeMessage}
               onChange={(e) => update("welcomeMessage", e.target.value)}
               className={inputClass}
             />
+          </div>
+
+          <div className="border-t pt-4">
+            <h4 className="text-sm font-semibold text-[#8B5A2B] uppercase tracking-wider mb-3">
+              Textos do Convite
+            </h4>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700">Cabeçalho</label>
+                <input
+                  type="text"
+                  value={form.invitationHeader}
+                  onChange={(e) => update("invitationHeader", e.target.value)}
+                  placeholder="Com a Bênção de Deus"
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700">Introdução do Convite</label>
+                <input
+                  type="text"
+                  value={form.invitationIntro}
+                  onChange={(e) => update("invitationIntro", e.target.value)}
+                  placeholder="Temos a alegria de vos convidar para o nosso casamento"
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700">Frase Romântica</label>
+                <input
+                  type="text"
+                  value={form.invitationRomantic}
+                  onChange={(e) => update("invitationRomantic", e.target.value)}
+                  placeholder="Duas vidas, dois corações, uma história para toda a vida."
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700">Homenagem / Presença</label>
+                <input
+                  type="text"
+                  value={form.invitationHonor}
+                  onChange={(e) => update("invitationHonor", e.target.value)}
+                  placeholder="Será uma honra celebrar este momento tão especial na presença de vocês."
+                  className={inputClass}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Rodapé</label>
+                  <input
+                    type="text"
+                    value={form.invitationFooter}
+                    onChange={(e) => update("invitationFooter", e.target.value)}
+                    placeholder="Juntos para sempre"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">Valores / Lema</label>
+                  <input
+                    type="text"
+                    value={form.invitationValues}
+                    onChange={(e) => update("invitationValues", e.target.value)}
+                    placeholder="Amor · Respeito · Companheirismo · Sempre"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {error && (
