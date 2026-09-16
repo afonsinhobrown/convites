@@ -20,20 +20,21 @@ export async function POST(request: Request) {
     const ceremonyAddress = String(body?.ceremonyAddress ?? "").trim();
     const rsvpContactRaw = String(body?.rsvpContact ?? "").trim();
     const welcomeMessage = String(body?.welcomeMessage ?? "").trim();
-    const templateSlug = String(body?.templateSlug ?? "magnolia-casal").trim();
+    const requestedSlug = String(body?.templateSlug ?? "magnolia-casal").trim();
 
-    if (!brideName || !groomName) {
-      return NextResponse.json({ error: "Os nomes dos noivos são obrigatórios" }, { status: 400 });
+    // Validar se o modelo está publicado e ativo
+    let tpl = await prisma.invitationTemplate.findFirst({
+      where: { slug: requestedSlug, status: "PUBLISHED", active: true },
+    });
+
+    if (!tpl) {
+      tpl = await prisma.invitationTemplate.findFirst({
+        where: { status: "PUBLISHED", active: true },
+        orderBy: { sortOrder: "asc" },
+      });
     }
-    if (!weddingDateRaw || Number.isNaN(new Date(weddingDateRaw).getTime())) {
-      return NextResponse.json({ error: "Data do casamento inválida" }, { status: 400 });
-    }
-    if (!ceremonyTime || !ceremonyVenue) {
-      return NextResponse.json({ error: "Hora e local são obrigatórios" }, { status: 400 });
-    }
-    if (!rsvpContactRaw) {
-      return NextResponse.json({ error: "O contacto RSVP é obrigatório" }, { status: 400 });
-    }
+
+    const templateSlug = tpl?.slug ?? requestedSlug;
 
     const rsvpContact = normalizeMozPhone(rsvpContactRaw) || rsvpContactRaw;
 

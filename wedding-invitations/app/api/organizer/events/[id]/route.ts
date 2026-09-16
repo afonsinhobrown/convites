@@ -69,6 +69,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (typeof data.welcomeMessage === "string") {
       data.welcomeMessage = data.welcomeMessage.trim() === "" ? null : data.welcomeMessage;
     }
+    if (typeof data.templateSlug === "string" && data.templateSlug.trim()) {
+      const tpl = await prisma.invitationTemplate.findFirst({
+        where: { slug: data.templateSlug.trim(), status: "PUBLISHED", active: true },
+      });
+      if (!tpl) {
+        return NextResponse.json({ error: "Este modelo não está disponível ou publicado." }, { status: 400 });
+      }
+    }
 
     if (Object.keys(data).length === 0) {
       return NextResponse.json({ error: "Sem campos para atualizar" }, { status: 400 });

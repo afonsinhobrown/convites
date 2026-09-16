@@ -24,7 +24,7 @@ export default async function NewEventPage({
   }
 
   const templates = await prisma.invitationTemplate.findMany({
-    where: { status: "PUBLISHED" },
+    where: { status: "PUBLISHED", active: true },
     orderBy: { sortOrder: "asc" },
   });
 

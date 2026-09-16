@@ -76,7 +76,7 @@ export default function HomePage() {
 async function Gallery() {
   const [templates, config] = await Promise.all([
     prisma.invitationTemplate.findMany({
-      where: { status: "PUBLISHED" },
+      where: { status: "PUBLISHED", active: true },
       orderBy: { sortOrder: "asc" },
     }),
     getSystemConfig(),

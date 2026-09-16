@@ -20,24 +20,38 @@ export default async function EditEventPage({ params }: { params: { id: string }
   const organizerId = await getCurrentOrganizerId();
   if (!organizerId) redirect("/organizer/login");
 
-  const [event, templates, guests, config, messagesCount, giftsCount, whatsAppLogsCount] =
-    await Promise.all([
-      prisma.event.findFirst({ where: { id: params.id, organizerId } }),
-      prisma.invitationTemplate.findMany({ orderBy: { sortOrder: "asc" } }),
-      prisma.guest.findMany({
-        where: { eventId: params.id },
-        orderBy: { createdAt: "asc" },
-      }),
-      getSystemConfig(),
-      prisma.message.count({ where: { eventId: params.id } }),
-      prisma.gift.count({ where: { eventId: params.id } }),
-      prisma.whatsAppLog.count({ where: { eventId: params.id } }),
-    ]);
+    const [event, publishedTemplates, guests, config, messagesCount, giftsCount, whatsAppLogsCount] =
+      await Promise.all([
+        prisma.event.findFirst({ where: { id: params.id, organizerId } }),
+        prisma.invitationTemplate.findMany({
+          where: { status: "PUBLISHED", active: true },
+          orderBy: { sortOrder: "asc" },
+        }),
+        prisma.guest.findMany({
+          where: { eventId: params.id },
+          orderBy: { createdAt: "asc" },
+        }),
+        getSystemConfig(),
+        prisma.message.count({ where: { eventId: params.id } }),
+        prisma.gift.count({ where: { eventId: params.id } }),
+        prisma.whatsAppLog.count({ where: { eventId: params.id } }),
+      ]);
 
-  if (!event) notFound();
+    if (!event) notFound();
 
-  const { day, month, year } = formatEventDate(event.weddingDate);
-  const currentTemplate = templates.find((t) => t.slug === event.templateSlug);
+    const templates = [...publishedTemplates];
+    let currentTemplate = templates.find((t) => t.slug === event.templateSlug);
+    if (!currentTemplate && event.templateSlug) {
+      const fallbackTpl = await prisma.invitationTemplate.findUnique({
+        where: { slug: event.templateSlug },
+      });
+      if (fallbackTpl) {
+        currentTemplate = fallbackTpl;
+        templates.unshift(fallbackTpl);
+      }
+    }
+
+    const { day, month, year } = formatEventDate(event.weddingDate);
 
   // SE O EVENTO NÃO ESTÁ PAGO: Bloqueia a tela e exibe o checkout do template NetShop
   if (!event.templatePaidAt) {

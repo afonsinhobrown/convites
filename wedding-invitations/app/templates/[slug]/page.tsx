@@ -9,8 +9,8 @@ import { Watermark } from "@/components/Watermark";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const t = await prisma.invitationTemplate.findUnique({
-    where: { slug: params.slug, status: "PUBLISHED" },
+  const t = await prisma.invitationTemplate.findFirst({
+    where: { slug: params.slug, status: "PUBLISHED", active: true },
   });
   if (!t) return { title: "Modelo não encontrado" };
   return {
@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function TemplatePage({ params }: { params: { slug: string } }) {
   const [template, config] = await Promise.all([
-    prisma.invitationTemplate.findUnique({
-      where: { slug: params.slug, status: "PUBLISHED" },
+    prisma.invitationTemplate.findFirst({
+      where: { slug: params.slug, status: "PUBLISHED", active: true },
     }),
     getSystemConfig(),
   ]);
