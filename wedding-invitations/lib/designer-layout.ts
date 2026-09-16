@@ -17,6 +17,7 @@ export interface LayoutField {
   lineHeight?: number;
   sourceKey?: string;
   locked?: boolean;
+  customText?: string;
 }
 
 export type LayoutJson = Record<string, LayoutField>;
@@ -477,6 +478,9 @@ export function getFieldValueWithSource(
   field: LayoutField | undefined,
   data: InvitationFieldData
 ): string {
+  if (field?.customText !== undefined && field?.customText !== null && field?.customText !== "") {
+    return field.customText;
+  }
   const realKey = field?.sourceKey || key;
   const base = { ...data, sourceKey: undefined } as unknown as Record<string, string | undefined>;
   return dataValue(realKey, base);

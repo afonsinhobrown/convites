@@ -87,6 +87,7 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    Conteudo: true,
     Tipo: true,
     Posição: true,
     Alinhamento: true,
@@ -425,6 +426,51 @@ return (
                 Apagar
               </button>
             </div>
+
+            {/* Conteúdo / Texto */}
+            <Section
+              title="Texto / Conteúdo"
+              open={openSections.Conteudo ?? true}
+              onToggle={() => toggleSection("Conteudo")}
+            >
+              <div>
+                <label className="block text-xs font-medium text-gray-700">
+                  Texto Personalizado
+                </label>
+                <p className="mb-1 text-[11px] text-gray-500">
+                  Escreva um texto fixo (ex: <i>TELMA &amp; LUIS</i>) ou deixe vazio para usar o valor automático do convite.
+                </p>
+                <textarea
+                  rows={2}
+                  value={selectedField?.customText ?? ""}
+                  placeholder={getFieldValueWithSource(
+                    selected,
+                    { ...selectedField, customText: undefined },
+                    SAMPLE_DATA
+                  )}
+                  onChange={(e) =>
+                    updateField(selected, {
+                      customText: e.target.value === "" ? undefined : e.target.value,
+                    })
+                  }
+                  className="w-full rounded-lg border border-gray-300 p-2 text-sm text-gray-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                />
+                <div className="mt-1 flex items-center justify-between text-[11px]">
+                  <span className={selectedField?.customText ? "font-medium text-emerald-600" : "text-gray-500"}>
+                    {selectedField?.customText ? "✓ Texto personalizado ativo" : "Usando valor dinâmico padrão"}
+                  </span>
+                  {selectedField?.customText && (
+                    <button
+                      type="button"
+                      onClick={() => updateField(selected, { customText: undefined })}
+                      className="font-semibold text-rose-600 hover:text-rose-800 hover:underline"
+                    >
+                      Restaurar Dinâmico
+                    </button>
+                  )}
+                </div>
+              </div>
+            </Section>
 
             {/* Tipografia */}
             <Section title="Tipografia" open={openSections.Tipo} onToggle={() => toggleSection("Tipo")}>
