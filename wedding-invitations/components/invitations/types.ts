@@ -2,6 +2,12 @@ export type InvitationMode = "preview" | "for_print" | "for_guest";
 
 export interface InvitationData {
   guestName?: string;
+  groomArabicName?: string;
+  brideArabicName?: string;
+  mosque?: string;
+  mosqueLocation?: string;
+  groomParents?: string;
+  brideParents?: string;
   brideName: string;
   groomName: string;
   day: string;

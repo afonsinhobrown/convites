@@ -20,15 +20,23 @@ import {
 } from "@/lib/designer-layout";
 
 const SAMPLE_DATA = {
-  guestName: "Maria Nhantumbo",
-  brideName: "Ana",
-  groomName: "Zlatan",
+  guestName: "SR. ABDUL E SRA. HALIMA",
+  groomArabicName: "OMAR",
+  brideArabicName: "FATIMA",
+  mosque: "Mesquita Al-Iman",
+  mosqueLocation: "RUA DA BEIRA, MAPUTO",
+  groomParents: "SR. ALY E SRA. CATIJA",
+  brideParents: "Pais da Noiva",
+  brideName: "FATIMA",
+  groomName: "OMAR",
   day: "12",
   month: "DEZEMBRO",
   year: "2026",
   time: "14:00",
-  venue: "Praia do Bilene",
-  address: "Circuito de Bilene, Gaza",
+  venue: "Mesquita Al-Iman",
+  address: "RUA DA BEIRA, MAPUTO",
+  locationName: "Mesquita Al-Iman",
+  locationAddress: "RUA DA BEIRA, MAPUTO",
   rsvpContact: "+258 84 000 0000",
   rsvpDate: undefined,
 };

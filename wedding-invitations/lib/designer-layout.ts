@@ -26,8 +26,14 @@ export type FieldKey = keyof typeof FIELD_ORDER;
 export const FIELD_ORDER = {
   guestName: "Convidado",
   invitationHeader: "Cabeçalho",
+  groomArabicName: "Nome Árabe Masculino",
+  brideArabicName: "Nome Árabe Feminino",
+  groomParents: "Pais do Noivo",
+  brideParents: "Pais da Noiva",
   brideName: "Noiva",
   groomName: "Noivo",
+  mosque: "Mesquita",
+  mosqueLocation: "Local da Mesquita",
   invitationIntro: "Introdução",
   day: "Dia",
   month: "Mês",
@@ -142,17 +148,33 @@ export const FX = {
 
 // Fonte default por tipo de campo (ao adicionar/duplicar)
 export function defaultFontFor(key: string): string {
-  if (key === "guestName" || key === "invitationHeader" || key === "invitationIntro" || key === "invitationValues") {
+  if (
+    key === "guestName" ||
+    key === "invitationHeader" ||
+    key === "invitationIntro" ||
+    key === "invitationValues" ||
+    key === "mosqueLocation"
+  ) {
     return "Inter";
   }
-  if (key === "invitationRomantic" || key === "invitationHonor" || key === "invitationFooter") {
+  if (
+    key === "invitationRomantic" ||
+    key === "invitationHonor" ||
+    key === "invitationFooter" ||
+    key === "groomParents" ||
+    key === "brideParents"
+  ) {
     return "Great Vibes";
   }
   return "Playfair Display";
 }
 
 export function emptyField(key: string): LayoutField {
-  const isName = key === "brideName" || key === "groomName";
+  const isName =
+    key === "brideName" ||
+    key === "groomName" ||
+    key === "groomArabicName" ||
+    key === "brideArabicName";
   const isPhoto = key === "photoLeft" || key === "photoRight";
   const family = defaultFontFor(key);
   return {
@@ -324,7 +346,19 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
   const realKey = data.sourceKey || key;
   switch (realKey) {
     case "guestName":
-      return data.guestName ?? "";
+      return data.guestName || "SR. ABDUL E SRA. HALIMA";
+    case "groomArabicName":
+      return data.groomArabicName || "OMAR";
+    case "brideArabicName":
+      return data.brideArabicName || "FATIMA";
+    case "mosque":
+      return data.mosque || data.mosqueName || "Mesquita Al-Iman";
+    case "mosqueLocation":
+      return data.mosqueLocation || data.mosqueAddress || "RUA DA BEIRA, MAPUTO";
+    case "groomParents":
+      return data.groomParents || "SR. ALY E SRA. CATIJA";
+    case "brideParents":
+      return data.brideParents || "Pais da Noiva";
     case "brideName":
       return data.brideName ?? "";
     case "groomName":
@@ -366,6 +400,12 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
 
 export type InvitationFieldData = {
   guestName?: string;
+  groomArabicName?: string;
+  brideArabicName?: string;
+  mosque?: string;
+  mosqueLocation?: string;
+  groomParents?: string;
+  brideParents?: string;
   brideName: string;
   groomName: string;
   day: string;
@@ -383,6 +423,8 @@ export type InvitationFieldData = {
   invitationHonor?: string;
   invitationFooter?: string;
   invitationValues?: string;
+  photoLeft?: string;
+  photoRight?: string;
 };
 
 export function getFieldValue(key: string, data: InvitationFieldData): string {

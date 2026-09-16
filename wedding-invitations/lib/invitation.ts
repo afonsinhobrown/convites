@@ -64,6 +64,12 @@ export function eventToInvitationData(event: Event): InvitationData {
   return {
     brideName: event.brideName ?? "",
     groomName: event.groomName ?? "",
+    groomArabicName: event.groomName ?? "OMAR",
+    brideArabicName: event.brideName ?? "FATIMA",
+    mosque: event.ceremonyVenue ?? "Mesquita Al-Iman",
+    mosqueLocation: event.ceremonyAddress ?? "RUA DA BEIRA, MAPUTO",
+    groomParents: "SR. ALY E SRA. CATIJA",
+    brideParents: "Pais da Noiva",
     day,
     month,
     year,
