@@ -14,21 +14,19 @@ export const metadata = {
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen bg-[#FDFBF7] text-gray-900 overflow-hidden">
-      {/* Imagem de Fundo com Transparência Suave e Elegante */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <Image
-          src="/fundo.png"
-          alt="Fundo DoReMi Eventos"
-          fill
-          priority
-          className="object-cover object-center opacity-20 filter saturate-150"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/60 via-[#FDFBF7]/40 to-[#FDFBF7]/80" />
-      </div>
+    <main className="relative min-h-screen bg-[#FDFBF7] text-gray-900">
+      {/* Imagem de Fundo Cultural de Casamentos com Transparência */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-bottom sm:bg-center bg-no-repeat opacity-50"
+        style={{
+          backgroundImage: "url('/fundo.png')",
+        }}
+      />
+      {/* Camada de suavização e realce dourado */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-white/70 via-[#FDFBF7]/50 to-[#FDFBF7]/85" />
 
       {/* Header com logo DoReMi */}
-      <header className="sticky top-0 z-30 border-b border-[#C5A059]/25 bg-white/85 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-30 border-b border-[#C5A059]/25 bg-white/90 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center">
