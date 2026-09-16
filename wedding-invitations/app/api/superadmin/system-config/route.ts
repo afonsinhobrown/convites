@@ -13,6 +13,7 @@ export async function PATCH(request: Request) {
     const invitationFeeCents = body.invitationFeeCents;
     const bimExchangeRate = body.bimExchangeRate;
     const netshopEnabled = body.netshopEnabled;
+    const sandboxEnabled = body.sandboxEnabled !== undefined ? Boolean(body.sandboxEnabled) : true;
     const templates = body.templates;
 
     if (!isNonNegativeInt(invitationFeeCents)) {
@@ -46,6 +47,7 @@ export async function PATCH(request: Request) {
         invitationFeeCents,
         bimExchangeRate,
         netshopEnabled,
+        sandboxEnabled,
       },
     });
 
@@ -67,6 +69,7 @@ export async function PATCH(request: Request) {
         invitationFeeCents: config.invitationFeeCents,
         bimExchangeRate: config.bimExchangeRate,
         netshopEnabled: config.netshopEnabled,
+        sandboxEnabled: config.sandboxEnabled,
       },
       templates: updatedTemplates.map((t) => ({
         id: t.id,

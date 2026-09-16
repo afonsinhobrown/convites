@@ -7,6 +7,7 @@ interface SystemConfigData {
   invitationFeeCents: number;
   bimExchangeRate: number;
   netshopEnabled: boolean;
+  sandboxEnabled: boolean;
 }
 
 interface TemplateData {
@@ -53,6 +54,7 @@ export function SuperAdminSettingsForm({
       invitationFeeCents: config.invitationFeeCents,
       bimExchangeRate: config.bimExchangeRate,
       netshopEnabled: config.netshopEnabled,
+      sandboxEnabled: config.sandboxEnabled,
       templates: templates.map((t) => ({
         id: t.id,
         priceUsdCents: t.priceUsdCents,
@@ -77,6 +79,7 @@ export function SuperAdminSettingsForm({
         invitationFeeCents: data.config.invitationFeeCents,
         bimExchangeRate: data.config.bimExchangeRate,
         netshopEnabled: data.config.netshopEnabled,
+        sandboxEnabled: data.config.sandboxEnabled ?? true,
       });
       setTemplates(
         data.templates.map((t: TemplateData) => ({
@@ -146,7 +149,7 @@ export function SuperAdminSettingsForm({
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-medium text-gray-900">Pagamentos</h2>
+            <h2 className="text-lg font-medium text-gray-900">Pagamentos &amp; Sandbox</h2>
 
             <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
               <div>
@@ -165,6 +168,30 @@ export function SuperAdminSettingsForm({
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                     config.netshopEnabled ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50/50 p-4">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Modo Sandbox (Testes)</p>
+                <p className="text-xs text-gray-600">
+                  Habilitar opção de pagamentos sandbox (10 MT - doremi modo sandbox) nas telas de pagamento.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={config.sandboxEnabled}
+                onClick={() => updateConfig("sandboxEnabled", !config.sandboxEnabled)}
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
+                  config.sandboxEnabled ? "bg-emerald-600" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                    config.sandboxEnabled ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
               </button>

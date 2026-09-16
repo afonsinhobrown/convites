@@ -41,7 +41,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const phoneRaw = body.phone ? String(body.phone).trim() : event.rsvpContact;
     const phone = normalizeMozPhone(phoneRaw) || phoneRaw;
 
-    const reference = `GFEE_${event.id}_${Date.now()}`;
+    const isSandboxActive = Boolean(body.isSandbox) && (config.sandboxEnabled ?? true);
+    const totalMzn = isSandboxActive ? 10 : guestCount * feePerGuestMzn;
+    const description = isSandboxActive ? "doremi modo sandbox" : undefined;
+    const reference = isSandboxActive ? `GFEE_SANDBOX_${event.id}_${Date.now()}` : `GFEE_${event.id}_${Date.now()}`;
+
     const origin = request.headers.get("origin") || request.headers.get("referer") || "https://convites-beta.vercel.app";
     const returnUrl = `${origin}/organizer/events/${event.id}?gfee_paid=1`;
 
@@ -51,6 +55,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       method,
       msisdn: method === "mpesa" ? phone : undefined,
       returnUrl,
+      description,
     });
 
     // Registar pagamento na BD
@@ -63,6 +68,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
         status: charge.status === "paid" ? "PAID" : "PENDING",
         provider: "netshop",
         providerRef: reference,
+        metadata: {
+          isSandbox: isSandboxActive,
+          description,
+        },
         confirmedAt: charge.status === "paid" ? new Date() : null,
       },
     });
@@ -84,6 +93,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       paid: charge.status === "paid" || !!event.guestFeePaidAt,
       totalMzn,
       guestCount,
+      isSandbox: isSandboxActive,
     });
   } catch (error) {
     console.error("Erro ao iniciar pagamento da taxa de convidados na NetShop:", error);

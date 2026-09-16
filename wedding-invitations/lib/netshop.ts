@@ -22,6 +22,7 @@ export async function createNetShopCharge(params: {
   method?: NetShopMethod;
   msisdn?: string;
   returnUrl?: string;
+  description?: string;
 }): Promise<NetShopChargeResult> {
   const apiKey = process.env.NETSHOP_API_KEY;
   const selectedMethod: NetShopMethod = params.method || "mpesa";
@@ -58,6 +59,10 @@ export async function createNetShopCharge(params: {
     reference: params.reference,
     method: selectedMethod,
   };
+
+  if (params.description) {
+    payload.description = params.description;
+  }
 
   if (selectedMethod === "mpesa" && phone) {
     payload.msisdn = phone;

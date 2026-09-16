@@ -40,8 +40,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const phoneRaw = body.phone ? String(body.phone).trim() : event.rsvpContact;
     const phone = normalizeMozPhone(phoneRaw) || phoneRaw;
 
-    const priceMzn = Math.round((template.priceUsdCents / 100) * config.bimExchangeRate);
-    const reference = `TPL_${event.id}_${Date.now()}`;
+    const isSandboxActive = Boolean(body.isSandbox) && (config.sandboxEnabled ?? true);
+    const priceMzn = isSandboxActive ? 10 : Math.round((template.priceUsdCents / 100) * config.bimExchangeRate);
+    const description = isSandboxActive ? "doremi modo sandbox" : undefined;
+    const reference = isSandboxActive ? `TPL_SANDBOX_${event.id}_${Date.now()}` : `TPL_${event.id}_${Date.now()}`;
 
     const origin = request.headers.get("origin") || request.headers.get("referer") || "https://convites-beta.vercel.app";
     const returnUrl = `${origin}/organizer/events/${event.id}?paid=1`;
@@ -52,6 +54,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       method,
       msisdn: method === "mpesa" ? phone : undefined,
       returnUrl,
+      description,
     });
 
     // Registar pagamento na BD
@@ -64,6 +67,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
         status: charge.status === "paid" ? "PAID" : "PENDING",
         provider: "netshop",
         providerRef: reference,
+        metadata: {
+          isSandbox: isSandboxActive,
+          description,
+        },
         confirmedAt: charge.status === "paid" ? new Date() : null,
       },
     });
@@ -73,7 +80,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       data: {
         templatePaymentRef: reference,
         templatePaidAt: charge.status === "paid" ? new Date() : null,
-        isSandbox: charge.status === "paid" ? false : event.isSandbox,
+        isSandbox: isSandboxActive,
       },
     });
 
@@ -84,6 +91,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
       checkoutUrl: charge.checkoutUrl,
       status: charge.status,
       paid: charge.status === "paid",
+      isSandbox: isSandboxActive,
+      amountMzn: priceMzn,
     });
   } catch (error) {
     console.error("Erro ao iniciar pagamento de template na NetShop:", error);

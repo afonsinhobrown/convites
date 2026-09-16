@@ -53,6 +53,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
           previewUrl: currentTemplate?.previewUrl ?? null,
           priceMzn,
         }}
+        sandboxAllowed={config.sandboxEnabled ?? true}
       />
     );
   }
@@ -149,6 +150,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
               eventData={eventData}
               guestFeePaid={!!event.guestFeePaidAt}
               guestFeeCents={event.guestFeeCents || 2500}
+              sandboxAllowed={config.sandboxEnabled ?? true}
               template={{
                 layout: currentTemplate?.componentName ?? event.templateSlug,
                 layoutJson: currentTemplate?.layoutJson ?? null,

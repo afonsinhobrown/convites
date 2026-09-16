@@ -46,6 +46,7 @@ export function InvitesPanel({
   template,
   guestFeePaid = false,
   guestFeeCents = 2500,
+  sandboxAllowed = true,
 }: {
   eventId: string;
   initialGuests: InviteGuest[];
@@ -53,6 +54,7 @@ export function InvitesPanel({
   template: TemplateInfo;
   guestFeePaid?: boolean;
   guestFeeCents?: number;
+  sandboxAllowed?: boolean;
 }) {
   const router = useRouter();
   const [guests, setGuests] = useState<InviteGuest[]>(initialGuests);
@@ -62,6 +64,7 @@ export function InvitesPanel({
 
   // Estados da taxa de convidados
   const [feeModalOpen, setFeeModalOpen] = useState(false);
+  const [isSandboxFee, setIsSandboxFee] = useState(false);
   // Só pré-preenche se o contacto for Vodacom 84/85
   const initialFeePhone = (() => {
     const clean = (eventData.rsvpContact || "").replace(/\D/g, "");
@@ -126,7 +129,7 @@ export function InvitesPanel({
       const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method: feeMethod, phone: feePhone }),
+        body: JSON.stringify({ method: feeMethod, phone: feePhone, isSandbox: isSandboxFee }),
       });
 
       const data = await res.json();
@@ -528,7 +531,9 @@ export function InvitesPanel({
               </div>
               <div className="flex justify-between text-base font-bold text-gray-900 border-t border-gray-200 mt-3 pt-2">
                 <span>Total a pagar:</span>
-                <span className="text-[#C5A059]">{totalFeeMzn} MT</span>
+                <span className="text-[#C5A059]">
+                  {isSandboxFee ? "10 MT (doremi modo sandbox)" : `${totalFeeMzn} MT`}
+                </span>
               </div>
             </div>
 
@@ -583,6 +588,25 @@ export function InvitesPanel({
                 </div>
               )}
 
+              {/* Checkbox Sandbox */}
+              {sandboxAllowed && (
+                <div className="flex items-center gap-2.5 rounded-xl border border-amber-300 bg-amber-50/70 p-3">
+                  <input
+                    id="guestfee-sandbox-toggle"
+                    type="checkbox"
+                    checked={isSandboxFee}
+                    onChange={(e) => setIsSandboxFee(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="guestfee-sandbox-toggle"
+                    className="text-xs font-semibold text-amber-900 cursor-pointer select-none"
+                  >
+                    Activar modo sandbox (10 MT — doremi modo sandbox)
+                  </label>
+                </div>
+              )}
+
               {feeError && (
                 <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-700">
                   {feeError}
@@ -606,7 +630,11 @@ export function InvitesPanel({
                     A processar...
                   </>
                 ) : (
-                  <>Pagar {totalFeeMzn} MT agora →</>
+                  <>
+                    Pagar{" "}
+                    {isSandboxFee ? "10 MT (doremi modo sandbox)" : `${totalFeeMzn} MT`}{" "}
+                    agora →
+                  </>
                 )}
               </button>
             </form>

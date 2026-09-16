@@ -30,11 +30,13 @@ interface EventPendingPaymentProps {
     previewUrl?: string | null;
     priceMzn: number;
   };
+  sandboxAllowed?: boolean;
 }
 
-export function EventPendingPayment({ event, template }: EventPendingPaymentProps) {
+export function EventPendingPayment({ event, template, sandboxAllowed = true }: EventPendingPaymentProps) {
   const router = useRouter();
   const [method, setMethod] = useState<"mpesa" | "card">("mpesa");
+  const [isSandbox, setIsSandbox] = useState(false);
 
   // Só pré-preenche se o contacto do evento for Vodacom (84 ou 85), senão deixa em branco
   const initialPhone = (() => {
@@ -95,7 +97,7 @@ export function EventPendingPayment({ event, template }: EventPendingPaymentProp
       const res = await fetch(`/api/organizer/events/${event.id}/payment/template`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, phone }),
+        body: JSON.stringify({ method, phone, isSandbox }),
       });
 
       const data = await res.json();
@@ -219,7 +221,9 @@ export function EventPendingPayment({ event, template }: EventPendingPaymentProp
                 </div>
                 <div className="flex justify-between pt-2 text-base font-bold text-gray-900">
                   <span>Total a pagar:</span>
-                  <span className="text-[#C5A059]">{template.priceMzn} MT</span>
+                  <span className="text-[#C5A059]">
+                    {isSandbox ? "10 MT (doremi modo sandbox)" : `${template.priceMzn} MT`}
+                  </span>
                 </div>
               </div>
 
@@ -357,6 +361,25 @@ export function EventPendingPayment({ event, template }: EventPendingPaymentProp
                   </div>
                 )}
 
+                {/* Checkbox Sandbox */}
+                {sandboxAllowed && (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-amber-300 bg-amber-50/70 p-3">
+                    <input
+                      id="template-sandbox-toggle"
+                      type="checkbox"
+                      checked={isSandbox}
+                      onChange={(e) => setIsSandbox(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="template-sandbox-toggle"
+                      className="text-xs font-semibold text-amber-900 cursor-pointer select-none"
+                    >
+                      Activar modo sandbox (10 MT — doremi modo sandbox)
+                    </label>
+                  </div>
+                )}
+
                 {error && (
                   <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
                     {error}
@@ -380,7 +403,11 @@ export function EventPendingPayment({ event, template }: EventPendingPaymentProp
                       A processar...
                     </>
                   ) : (
-                    <>Pagar agora ({template.priceMzn} MT) →</>
+                    <>
+                      Pagar agora (
+                      {isSandbox ? "10 MT — doremi modo sandbox" : `${template.priceMzn} MT`}
+                      ) →
+                    </>
                   )}
                 </button>
               </form>

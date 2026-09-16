@@ -18,6 +18,7 @@ export default async function SuperAdminSettingsPage() {
         invitationFeeCents: systemConfig.invitationFeeCents,
         bimExchangeRate: systemConfig.bimExchangeRate,
         netshopEnabled: systemConfig.netshopEnabled,
+        sandboxEnabled: systemConfig.sandboxEnabled ?? true,
       }}
       initialTemplates={templates.map((t) => ({
         id: t.id,
