@@ -227,11 +227,19 @@ export function DesignerDashboard({
             <h1 className="text-xl font-bold text-gray-900">Painel do Designer</h1>
             <p className="text-sm text-gray-500">Olá, {designer.name} · {templates.length} templates</p>
           </div>
-          <form action="/api/designer/logout" method="POST">
-            <button className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-              Sair
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/designer/new"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 transition"
+            >
+              <span>+ Adicionar modelo →</span>
+            </Link>
+            <form action="/api/designer/logout" method="POST">
+              <button className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
