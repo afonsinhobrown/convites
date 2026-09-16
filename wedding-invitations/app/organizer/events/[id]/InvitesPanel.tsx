@@ -111,19 +111,24 @@ export function InvitesPanel({
     setFeeError(null);
     setFeeSuccess(null);
 
+    let cleanMsisdn = "";
+
     if (feeMethod === "mpesa") {
-      const clean = feePhone.replace(/\D/g, "");
-      const local = clean.startsWith("258") ? clean.slice(3) : clean;
-      if (!local.startsWith("84") && !local.startsWith("85")) {
+      let localDigits = feePhone.replace(/\D/g, "");
+      if (localDigits.startsWith("258") && localDigits.length > 9) {
+        localDigits = localDigits.slice(3);
+      }
+      if (!localDigits.startsWith("84") && !localDigits.startsWith("85")) {
         setFeeError(
           "Para pagar via M-Pesa é necessário um número Vodacom (iniciado por 84 ou 85). Se utiliza outro operador/banco, selecione 'BIM / Cartão'."
         );
         return;
       }
-      if (local.length !== 9) {
-        setFeeError("O número de telefone deve ter 9 dígitos (ex: 84 123 4567).");
+      if (localDigits.length !== 9) {
+        setFeeError("O número de telefone deve ter exatamente 9 dígitos (ex: 847981166).");
         return;
       }
+      cleanMsisdn = `258${localDigits}`;
     }
 
     setFeeLoading(true);
@@ -132,7 +137,7 @@ export function InvitesPanel({
       const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method: feeMethod, phone: feePhone, isSandbox: isSandboxFee }),
+        body: JSON.stringify({ method: feeMethod, phone: cleanMsisdn || feePhone, isSandbox: isSandboxFee }),
       });
 
       const data = await res.json();
@@ -588,22 +593,32 @@ export function InvitesPanel({
 
               {feeMethod === "mpesa" && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700">
+                  <label className="block text-xs font-semibold text-gray-700">
                     Número M-Pesa (Vodacom)
                   </label>
                   <div className="mt-1 flex rounded-lg shadow-sm">
-                    <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 text-xs text-gray-500">
+                    <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 px-3 text-xs font-bold text-gray-700 select-none">
                       +258
                     </span>
                     <input
                       type="tel"
                       required
-                      value={feePhone.replace(/^\+?258/, "")}
-                      onChange={(e) => setFeePhone(`+258${e.target.value.replace(/\D/g, "")}`)}
-                      placeholder="841234567"
-                      className="block w-full rounded-r-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
+                      maxLength={9}
+                      value={feePhone}
+                      onChange={(e) => {
+                        let val = e.target.value.replace(/\D/g, "");
+                        if (val.startsWith("258") && val.length > 9) {
+                          val = val.slice(3);
+                        }
+                        setFeePhone(val.slice(0, 9));
+                      }}
+                      placeholder="847981166"
+                      className="block w-full rounded-r-lg border border-gray-300 px-3 py-2 text-sm font-medium tracking-wider focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
                     />
                   </div>
+                  <p className="mt-1 text-[11px] text-gray-500">
+                    Introduza apenas os 9 dígitos. O prefixo +258 é adicionado automaticamente.
+                  </p>
                 </div>
               )}
 

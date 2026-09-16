@@ -1,4 +1,5 @@
 import * as crypto from "crypto";
+import { toMozMsisdn } from "@/lib/phone";
 
 const NETSHOP_API_URL = "https://www.netshop.co.mz/api/v1";
 
@@ -43,17 +44,8 @@ export async function createNetShopCharge(params: {
     );
   }
 
-  // Normalizar número de telefone moçambicano para MSISDN internacional (25884XXXXXXX / 25885XXXXXXX)
-  let phone = params.msisdn ? params.msisdn.replace(/\D/g, "") : undefined;
-  if (phone) {
-    if (phone.startsWith("258") && phone.length === 12) {
-      // já está 25884XXXXXXX
-    } else if (phone.length === 9 && (phone.startsWith("84") || phone.startsWith("85") || phone.startsWith("8"))) {
-      phone = `258${phone}`;
-    } else {
-      phone = undefined;
-    }
-  }
+  // Normalizar qualquer formato moçambicano para MSISDN puro (25884XXXXXXX / 25885XXXXXXX)
+  const phone = toMozMsisdn(params.msisdn);
 
   const payload: Record<string, unknown> = {
     amount: Math.round(params.amountMZN),

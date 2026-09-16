@@ -42,7 +42,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
   const initialPhone = (() => {
     const clean = (event.rsvpContact || "").replace(/\D/g, "");
     const local = clean.startsWith("258") ? clean.slice(3) : clean;
-    return local.startsWith("84") || local.startsWith("85") ? `+258${local}` : "";
+    return local.startsWith("84") || local.startsWith("85") ? local.slice(0, 9) : "";
   })();
 
   const [phone, setPhone] = useState(initialPhone);
@@ -75,20 +75,25 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
     setError(null);
     setSuccessMsg(null);
 
+    let cleanMsisdn = "";
+
     // Validação específica de M-Pesa (Vodacom)
     if (method === "mpesa") {
-      const clean = phone.replace(/\D/g, "");
-      const local = clean.startsWith("258") ? clean.slice(3) : clean;
-      if (!local.startsWith("84") && !local.startsWith("85")) {
+      let localDigits = phone.replace(/\D/g, "");
+      if (localDigits.startsWith("258") && localDigits.length > 9) {
+        localDigits = localDigits.slice(3);
+      }
+      if (!localDigits.startsWith("84") && !localDigits.startsWith("85")) {
         setError(
           "Para pagar via M-Pesa é necessário um número Vodacom (iniciado por 84 ou 85). Se utiliza outro operador/banco, selecione 'BIM / Cartão'."
         );
         return;
       }
-      if (local.length !== 9) {
-        setError("O número de telefone deve ter 9 dígitos (ex: 84 123 4567).");
+      if (localDigits.length !== 9) {
+        setError("O número de telefone deve ter exatamente 9 dígitos (ex: 847981166).");
         return;
       }
+      cleanMsisdn = `258${localDigits}`;
     }
 
     setLoading(true);
@@ -97,7 +102,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
       const res = await fetch(`/api/organizer/events/${event.id}/payment/template`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, phone, isSandbox }),
+        body: JSON.stringify({ method, phone: cleanMsisdn || phone, isSandbox }),
       });
 
       const data = await res.json();
@@ -331,24 +336,31 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
 
                 {method === "mpesa" ? (
                   <div>
-                    <label className="block text-xs font-medium text-gray-700">
+                    <label className="block text-xs font-semibold text-gray-700">
                       Número Vodacom (84 ou 85)
                     </label>
                     <div className="mt-1 flex rounded-lg shadow-sm">
-                      <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 text-xs text-gray-500">
+                      <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 px-3.5 text-sm font-bold text-gray-700 select-none">
                         +258
                       </span>
                       <input
                         type="tel"
                         required
-                        value={phone.replace(/^\+?258/, "")}
-                        onChange={(e) => setPhone(`+258${e.target.value.replace(/\D/g, "")}`)}
-                        placeholder="841234567"
-                        className="block w-full rounded-r-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
+                        maxLength={9}
+                        value={phone}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "");
+                          if (val.startsWith("258") && val.length > 9) {
+                            val = val.slice(3);
+                          }
+                          setPhone(val.slice(0, 9));
+                        }}
+                        placeholder="847981166"
+                        className="block w-full rounded-r-lg border border-gray-300 px-3.5 py-2.5 text-base font-medium tracking-wider focus:border-[#C5A059] focus:outline-none focus:ring-1 focus:ring-[#C5A059]"
                       />
                     </div>
                     <p className="mt-1 text-[11px] text-gray-500">
-                      Receberá uma mensagem no telemóvel para autorizar com o PIN M-Pesa.
+                      Introduza apenas os 9 dígitos (ex: 847981166). O prefixo +258 é adicionado automaticamente.
                     </p>
                   </div>
                 ) : (
