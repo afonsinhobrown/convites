@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Palette } from "lucide-react";
+import { Palette, ArrowLeft } from "lucide-react";
 
 export function DesignerLoginForm() {
   const router = useRouter();
@@ -43,17 +44,27 @@ export function DesignerLoginForm() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-6 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
-      >
-        <div className="flex flex-col items-center gap-2 text-center">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
-            <Palette className="h-6 w-6 text-rose-700" />
-          </span>
-          <h1 className="text-xl font-semibold text-gray-900">Acesso do Designer</h1>
-          <p className="text-sm text-gray-500">Introduza as suas credenciais para continuar.</p>
+      <div className="w-full max-w-sm">
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Voltar à página inicial
+          </Link>
         </div>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full space-y-6 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
+        >
+          <div className="flex flex-col items-center gap-2 text-center">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+              <Palette className="h-6 w-6 text-rose-700" />
+            </span>
+            <h1 className="text-xl font-semibold text-gray-900">Acesso do Designer</h1>
+            <p className="text-sm text-gray-500">Introduza as suas credenciais para continuar.</p>
+          </div>
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -102,7 +113,8 @@ export function DesignerLoginForm() {
         >
           {loading ? "A entrar..." : "Entrar"}
         </button>
-      </form>
+        </form>
+      </div>
     </main>
   );
 }

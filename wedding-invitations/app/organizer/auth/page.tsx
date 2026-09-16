@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 
 export const metadata = { title: "Acesso — Convites de Casamento" };
 
@@ -14,6 +14,15 @@ export default function AuthChoicePage({
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#FDFBF7] px-4">
       <div className="w-full max-w-sm">
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Voltar à página inicial
+          </Link>
+        </div>
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#C5A059]/10">
