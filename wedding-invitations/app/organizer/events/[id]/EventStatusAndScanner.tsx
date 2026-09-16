@@ -35,7 +35,12 @@ export function EventStatusAndScanner({
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const scannerUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/scanner/${eventId}`;
+  function getScannerUrl() {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/scanner/${eventId}`;
+    }
+    return `/scanner/${eventId}`;
+  }
 
   async function handleToggleStatus() {
     const nextStatus = status === "ACTIVE" ? "COMPLETED" : "ACTIVE";
@@ -84,7 +89,7 @@ export function EventStatusAndScanner({
   }
 
   function handleCopyScannerLink() {
-    navigator.clipboard.writeText(scannerUrl);
+    navigator.clipboard.writeText(getScannerUrl());
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
