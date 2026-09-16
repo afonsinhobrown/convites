@@ -28,34 +28,52 @@ export async function POST(req: NextRequest) {
   }
 
   const event = String(body.event || body.type || "");
-  const data = (body.data || body) as Record<string, unknown>;
+  const data = (body.data || body.charge || body) as Record<string, unknown>;
 
-  if (event === "charge.paid" || data.status === "paid" || data.status === "succeeded") {
-    const reference = typeof data.reference === "string" ? data.reference : undefined;
-    if (reference) {
+  const status = String(data.status || body.status || "").toLowerCase();
+  const isPaid = event === "charge.paid" || status === "paid" || status === "succeeded";
+
+  if (isPaid) {
+    const reference =
+      (typeof data.reference === "string" && data.reference ? data.reference : "") ||
+      (typeof data.order_id === "string" && data.order_id ? data.order_id : "") ||
+      (typeof body.reference === "string" && body.reference ? body.reference : "") ||
+      (typeof body.order_id === "string" && body.order_id ? body.order_id : "") ||
+      undefined;
+
+    const chargeId = (typeof data.id === "string" && data.id ? data.id : "") || (typeof body.id === "string" && body.id ? body.id : "") || undefined;
+
+    if (reference || chargeId) {
       // 1. Pagamento de Template (TPL_...)
-      if (reference.startsWith("TPL_")) {
+      if (reference && reference.startsWith("TPL_")) {
+        const rawId = reference.replace(/^TPL_(SANDBOX_)?/, "").split("_")[0];
         const ev = await prisma.event.findFirst({
           where: {
             OR: [
               { templatePaymentRef: reference },
-              { id: reference.replace(/^TPL_/, "").split("_")[0] },
+              { id: rawId },
             ],
           },
         });
 
         if (ev) {
+          const isSandboxPayment = reference.includes("SANDBOX");
           await prisma.event.update({
             where: { id: ev.id },
             data: {
               templatePaidAt: new Date(),
               templatePaymentRef: reference,
-              isSandbox: false,
+              isSandbox: isSandboxPayment,
             },
           });
 
           await prisma.payment.updateMany({
-            where: { providerRef: reference },
+            where: {
+              OR: [
+                { providerRef: reference },
+                { eventId: ev.id, type: "TEMPLATE", status: "PENDING" },
+              ],
+            },
             data: { status: "PAID", confirmedAt: new Date() },
           });
 
@@ -64,12 +82,13 @@ export async function POST(req: NextRequest) {
       }
 
       // 2. Taxa de Convidados (GFEE_...)
-      if (reference.startsWith("GFEE_")) {
+      if (reference && reference.startsWith("GFEE_")) {
+        const rawId = reference.replace(/^GFEE_(SANDBOX_)?/, "").split("_")[0];
         const ev = await prisma.event.findFirst({
           where: {
             OR: [
               { guestFeePaymentRef: reference },
-              { id: reference.replace(/^GFEE_/, "").split("_")[0] },
+              { id: rawId },
             ],
           },
         });
@@ -84,7 +103,12 @@ export async function POST(req: NextRequest) {
           });
 
           await prisma.payment.updateMany({
-            where: { providerRef: reference },
+            where: {
+              OR: [
+                { providerRef: reference },
+                { eventId: ev.id, type: "GUEST_FEE", status: "PENDING" },
+              ],
+            },
             data: { status: "PAID", confirmedAt: new Date() },
           });
 
