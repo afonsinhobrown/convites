@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { DESIGNER_COOKIE_NAME, verifyDesignerSessionToken } from "@/lib/designer-auth";
+import { extractTemplateDefaultData } from "@/lib/designer-layout";
 
 async function getDesigner() {
   const token = cookies().get(DESIGNER_COOKIE_NAME)?.value;
@@ -24,7 +25,12 @@ export async function PATCH(request: Request, { params }: { params: { templateId
 
     const template = await prisma.invitationTemplate.update({
       where: { slug: params.templateId },
-      data: { layoutJson: body.layoutJson, editedById: designer.id, editedAt: new Date() },
+      data: {
+        layoutJson: body.layoutJson,
+        demoData: extractTemplateDefaultData({ slug: params.templateId, layoutJson: body.layoutJson }),
+        editedById: designer.id,
+        editedAt: new Date(),
+      },
     });
 
     return NextResponse.json({ id: template.id, slug: template.slug, layoutJson: template.layoutJson });

@@ -357,6 +357,43 @@ export function fontFamilyClass(fontFamily: string): string {
   }
 }
 
+export const DESIGNER_SAMPLE_DATA: Record<string, string> = {
+  guestName: "Lucas Whilo e Esposa",
+  groomArabicName: "OMAR",
+  brideArabicName: "FATIMA",
+  mosque: "Mesquita Al-Iman",
+  mosqueLocation: "RUA DA BEIRA, MAPUTO",
+  groomParents: "SR. ALY E SRA. CATIJA",
+  brideParents: "SR. FARUK E SRA. AYESHA",
+  brideName: "FATIMA",
+  groomName: "OMAR",
+  day: "12",
+  month: "DEZEMBRO",
+  year: "2026",
+  time: "14:00",
+  dia1: "01",
+  mes1: "02",
+  ano1: "27",
+  hora1: "14h00",
+  data_completa: "08/09/2027",
+  data_setembro: "Sábado, 26 de Setembro de 2026",
+  data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
+  ele_esposa: "Lucas Whilo e Esposa",
+  noivos: "JÚLIA & ANTÓNIO",
+  venue: "HOTEL LUZ",
+  address: "Av. da Marginal, Maputo",
+  locationName: "HOTEL LUZ",
+  locationAddress: "Av. da Marginal, Maputo",
+  rsvpContact: "+258 84 000 0000",
+  rsvpDate: "15 de Outubro",
+  invitationHeader: "Com a Bênção de Deus",
+  invitationIntro: "Temos a alegria de vos convidar para o nosso casamento",
+  invitationRomantic: "Duas vidas, dois corações, uma história para toda a vida.",
+  invitationHonor: "Será uma honra celebrar este momento tão especial na presença de vocês.",
+  invitationFooter: "Juntos para sempre",
+  invitationValues: "Amor · Respeito · Companheirismo · Sempre",
+};
+
 // Valores que são renderizados com prefixo "DE " (mês/ano) conforme imagens
 export function fieldLabel(key: string): string {
   return FIELD_ORDER[key as FieldKey] ?? key;
@@ -366,7 +403,7 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
   const realKey = data.sourceKey || key;
   switch (realKey) {
     case "guestName":
-      return data.guestName || "SR. ABDUL E SRA. HALIMA";
+      return data.guestName || "Lucas Whilo e Esposa";
     case "groomArabicName":
       return data.groomArabicName || "OMAR";
     case "brideArabicName":
@@ -388,17 +425,17 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
     case "dia1":
       return data.dia1 || "01";
     case "month":
-      return `DE ${data.month ?? ""}`;
+      return data.month ? `DE ${data.month}` : "DE DEZEMBRO";
     case "mes1":
       return data.mes1 || "02";
     case "year":
-      return `DE ${data.year ?? ""}`;
+      return data.year ? `DE ${data.year}` : "DE 2026";
     case "ano1":
       return data.ano1 || "27";
     case "time":
-      return data.time ?? "";
+      return data.time || "14:00";
     case "hora1":
-      return data.hora1 || "14h00";
+      return data.hora1 || "14:00";
     case "data_completa":
       return data.data_completa || "08/09/2027";
     case "data_setembro":
@@ -410,14 +447,14 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
     case "noivos":
       return (
         data.noivos ||
-        (data.brideName && data.groomName
+        (data.brideName && data.groomName && data.brideName !== "Ana" && data.groomName !== "Zlatan"
           ? `${data.brideName} & ${data.groomName}`
-          : data.brideName || data.groomName || "JÚLIA & ANTÓNIO")
+          : "JÚLIA & ANTÓNIO")
       );
     case "locationName":
-      return data.locationName ?? data.venue ?? "";
+      return data.locationName ?? data.venue ?? "HOTEL LUZ";
     case "locationAddress":
-      return data.locationAddress ?? data.address ?? "";
+      return data.locationAddress ?? data.address ?? "Av. da Marginal, Maputo";
     case "invitationHeader":
       return data.invitationHeader ?? "Com a Bênção de Deus";
     case "invitationIntro":
@@ -431,7 +468,7 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
     case "invitationValues":
       return data.invitationValues ?? "Amor · Respeito · Companheirismo · Sempre";
     case "rsvpContact":
-      return data.rsvpDate ? `${data.rsvpContact ?? ""} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "");
+      return data.rsvpDate ? `${data.rsvpContact ?? "+258 84 000 0000"} · Até ${data.rsvpDate}` : (data.rsvpContact ?? "+258 84 000 0000");
     case "photoLeft":
       return data.photoLeft ?? "";
     case "photoRight":
@@ -627,7 +664,11 @@ export function extractTemplateDefaultData(template: {
     return undefined;
   };
 
-  const coupleText = getCustom("noivos") || (typeof demo.noivos === "string" ? demo.noivos : undefined);
+  const coupleText =
+    getCustom("noivos") ||
+    (typeof demo.noivos === "string" ? demo.noivos : undefined) ||
+    (layout.noivos ? "JÚLIA & ANTÓNIO" : undefined);
+
   let brideFromCouple = "";
   let groomFromCouple = "";
   if (coupleText && (coupleText.includes("&") || coupleText.includes(" e "))) {
@@ -639,12 +680,12 @@ export function extractTemplateDefaultData(template: {
   const brideName =
     getCustom("brideName") ||
     brideFromCouple ||
-    (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "Ana");
+    (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "JÚLIA");
 
   const groomName =
     getCustom("groomName") ||
     groomFromCouple ||
-    (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "Zlatan");
+    (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "ANTÓNIO");
 
   const ceremonyVenue =
     getCustom("locationName") ||
@@ -652,7 +693,7 @@ export function extractTemplateDefaultData(template: {
     getCustom("mosque") ||
     (typeof demo.venue === "string" && demo.venue ? demo.venue : "") ||
     (typeof demo.locationName === "string" && demo.locationName ? demo.locationName : "") ||
-    "Quinta dos Coqueiros";
+    "HOTEL LUZ";
 
   const ceremonyAddress =
     getCustom("locationAddress") ||
@@ -664,12 +705,12 @@ export function extractTemplateDefaultData(template: {
 
   const rsvpContact =
     getCustom("rsvpContact") ||
-    (typeof demo.rsvpContact === "string" && demo.rsvpContact ? demo.rsvpContact : "+258 84 123 4567");
+    (typeof demo.rsvpContact === "string" && demo.rsvpContact ? demo.rsvpContact : "+258 84 000 0000");
 
   const ceremonyTime =
     getCustom("time") ||
     getCustom("hora1") ||
-    (typeof demo.time === "string" && demo.time ? demo.time : "15:30");
+    (typeof demo.time === "string" && demo.time ? demo.time : "14:00");
 
   const invitationHeader =
     getCustom("invitationHeader") ||
@@ -698,7 +739,7 @@ export function extractTemplateDefaultData(template: {
   return {
     brideName,
     groomName,
-    weddingDate: "2026-10-24",
+    weddingDate: "2027-09-08",
     ceremonyTime,
     ceremonyVenue,
     ceremonyAddress,
