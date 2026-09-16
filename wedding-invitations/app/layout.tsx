@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import {
+  Alex_Brush,
   Allura,
   Cormorant_Garamond,
   Great_Vibes,
   Inter,
   Lora,
   Montserrat,
+  Parisienne,
   Pinyon_Script,
   Playfair_Display,
 } from "next/font/google";
@@ -52,6 +54,16 @@ const allura = Allura({
   variable: "--font-allura",
   weight: "400",
 });
+const alexBrush = Alex_Brush({
+  subsets: ["latin"],
+  variable: "--font-alex-brush",
+  weight: "400",
+});
+const parisienne = Parisienne({
+  subsets: ["latin"],
+  variable: "--font-parisienne",
+  weight: "400",
+});
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
@@ -77,7 +89,7 @@ export default function RootLayout({
     <html lang="pt" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${greatVibes.variable} ${cormorant.variable} ${pinyon.variable} ${allura.variable} ${montserrat.variable} ${lora.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${greatVibes.variable} ${cormorant.variable} ${pinyon.variable} ${allura.variable} ${alexBrush.variable} ${parisienne.variable} ${montserrat.variable} ${lora.variable} antialiased`}
       >
         {children}
       </body>

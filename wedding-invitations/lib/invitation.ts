@@ -93,6 +93,7 @@ export function eventToInvitationData(event: Event): InvitationData {
     data_completa: `${day}/${String(d.getMonth() + 1).padStart(2, "0")}/${year}`,
     data_setembro: `${weekday}, ${d.getDate()} de ${monthLabel} de ${year}`,
     data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
+    ele_esposa: `${event.groomName ?? "Lucas Whilo"} e Esposa`,
     locationName: event.ceremonyVenue ?? "",
     locationAddress: event.ceremonyAddress ?? "",
     venue: event.ceremonyVenue ?? "",

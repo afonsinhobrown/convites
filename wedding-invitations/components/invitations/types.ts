@@ -21,6 +21,7 @@ export interface InvitationData {
   data_completa?: string;
   data_setembro?: string;
   data_islao?: string;
+  ele_esposa?: string;
   venue: string;
   address: string;
   locationName?: string;

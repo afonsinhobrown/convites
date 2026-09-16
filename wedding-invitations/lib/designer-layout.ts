@@ -46,6 +46,7 @@ export const FIELD_ORDER = {
   data_completa: "Data Completa (08/09/2027)",
   data_setembro: "Data Extensa (Sábado, 26 de Setembro de 2026)",
   data_islao: "Data Islâmica (14 de Rabīʿ al-Thānī de 1448 H)",
+  ele_esposa: "Ele e Esposa (Lucas Whilo e Esposa)",
   invitationRomantic: "Frase romântica",
   locationName: "Nome do local",
   locationAddress: "Morada do local",
@@ -59,11 +60,13 @@ export const FIELD_ORDER = {
 
 export const FONT_FAMILIES = [
   { label: "Playfair Display", value: "Playfair Display", clue: "Serifada elegante" },
+  { label: "Alex Brush", value: "Alex Brush", clue: "Cursiva manuscrita fluida" },
   { label: "Great Vibes", value: "Great Vibes", clue: "Cursiva romântica" },
-  { label: "Inter", value: "Inter", clue: "Sans-serif moderna" },
-  { label: "Cormorant Garamond", value: "Cormorant Garamond", clue: "Serifada clássica" },
+  { label: "Parisienne", value: "Parisienne", clue: "Cursiva sofisticada" },
   { label: "Pinyon Script", value: "Pinyon Script", clue: "Cursiva formal" },
   { label: "Allura", value: "Allura", clue: "Cursiva suave" },
+  { label: "Inter", value: "Inter", clue: "Sans-serif moderna" },
+  { label: "Cormorant Garamond", value: "Cormorant Garamond", clue: "Serifada clássica" },
   { label: "Montserrat", value: "Montserrat", clue: "Sans-serif" },
   { label: "Lora", value: "Lora", clue: "Serifada" },
 ];
@@ -172,6 +175,9 @@ export function defaultFontFor(key: string): string {
     key === "brideParents"
   ) {
     return "Great Vibes";
+  }
+  if (key === "ele_esposa") {
+    return "Alex Brush";
   }
   return "Playfair Display";
 }
@@ -325,8 +331,12 @@ export function fontFamilyClass(fontFamily: string): string {
   switch (fontFamily) {
     case "Playfair Display":
       return "font-serif-custom";
+    case "Alex Brush":
+      return "font-alex-brush";
     case "Great Vibes":
       return "font-cursive-custom";
+    case "Parisienne":
+      return "font-parisienne";
     case "Inter":
       return "font-sans-custom";
     case "Cormorant Garamond":
@@ -392,6 +402,8 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
       return data.data_setembro || "Sábado, 26 de Setembro de 2026";
     case "data_islao":
       return data.data_islao || "14 de Rabīʿ al-Thānī de 1448 H";
+    case "ele_esposa":
+      return data.ele_esposa || "Lucas Whilo e Esposa";
     case "locationName":
       return data.locationName ?? data.venue ?? "";
     case "locationAddress":
@@ -440,6 +452,7 @@ export type InvitationFieldData = {
   data_completa?: string;
   data_setembro?: string;
   data_islao?: string;
+  ele_esposa?: string;
   venue: string;
   address: string;
   rsvpContact: string;

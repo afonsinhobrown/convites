@@ -44,6 +44,12 @@ body {
 .font-allura {
   font-family: var(--font-allura), "Allura", "Segoe Script", cursive;
 }
+.font-alex-brush {
+  font-family: var(--font-alex-brush), "Alex Brush", "Brush Script MT", "Segoe Script", cursive;
+}
+.font-parisienne {
+  font-family: var(--font-parisienne), "Parisienne", "Brush Script MT", "Segoe Script", cursive;
+}
 .font-montserrat {
   font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
 }
