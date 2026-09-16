@@ -39,6 +39,10 @@ export async function POST(
       return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
     }
 
+    if (!event.templatePaidAt) {
+      return NextResponse.json({ error: "Evento aguarda pagamento" }, { status: 402 });
+    }
+
     const body = await request.json().catch(() => ({}));
     const mode = body?.mode;
     if (mode !== "for_print" && mode !== "for_guest") {

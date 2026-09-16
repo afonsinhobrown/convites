@@ -24,10 +24,14 @@ export async function POST(
 
     const event = await prisma.event.findFirst({
       where: { id: params.id, organizerId },
-      select: { id: true },
+      select: { id: true, templatePaidAt: true },
     });
     if (!event) {
       return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
+    }
+
+    if (!event.templatePaidAt) {
+      return NextResponse.json({ error: "Evento aguarda pagamento" }, { status: 402 });
     }
 
     const formData = await request.formData();

@@ -3,12 +3,14 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganizerId } from "@/lib/session";
 import { formatEventDate, getBaseUrl, eventToInvitationData } from "@/lib/invitation";
+import { getSystemConfig } from "@/lib/config";
 import { ArrowLeft } from "lucide-react";
 import { TemplatePicker } from "./TemplatePicker";
 import { GuestForm } from "./GuestForm";
 import { CouplePhotos } from "./CouplePhotos";
 import { InvitesPanel, type InviteGuest } from "./InvitesPanel";
 import { EventDetailsEditor } from "./EventDetailsEditor";
+import { EventPendingPayment } from "./EventPendingPayment";
 
 export const dynamic = "force-dynamic";
 
@@ -16,18 +18,44 @@ export default async function EditEventPage({ params }: { params: { id: string }
   const organizerId = await getCurrentOrganizerId();
   if (!organizerId) redirect("/organizer/login");
 
-  const [event, templates, guests] = await Promise.all([
+  const [event, templates, guests, config] = await Promise.all([
     prisma.event.findFirst({ where: { id: params.id, organizerId } }),
     prisma.invitationTemplate.findMany({ orderBy: { sortOrder: "asc" } }),
     prisma.guest.findMany({
       where: { eventId: params.id },
       orderBy: { createdAt: "asc" },
     }),
+    getSystemConfig(),
   ]);
 
   if (!event) notFound();
 
   const { day, month, year } = formatEventDate(event.weddingDate);
+  const currentTemplate = templates.find((t) => t.slug === event.templateSlug);
+
+  // SE O EVENTO NÃO ESTÁ PAGO: Bloqueia a tela e exibe o checkout do template NetShop
+  if (!event.templatePaidAt) {
+    const priceMzn = Math.round(((currentTemplate?.priceUsdCents ?? 0) / 100) * config.bimExchangeRate);
+    return (
+      <EventPendingPayment
+        event={{
+          id: event.id,
+          brideName: event.brideName,
+          groomName: event.groomName,
+          ceremonyVenue: event.ceremonyVenue,
+          ceremonyTime: event.ceremonyTime,
+          weddingDateFormatted: `${day} de ${month.toLowerCase()} de ${year}`,
+          templateSlug: event.templateSlug,
+          rsvpContact: event.rsvpContact,
+        }}
+        template={{
+          name: currentTemplate?.name ?? "Modelo de Convite",
+          previewUrl: currentTemplate?.previewUrl ?? null,
+          priceMzn,
+        }}
+      />
+    );
+  }
 
   // Formato YYYY-MM-DD para o input type="date"
   const d = new Date(event.weddingDate);
@@ -46,7 +74,6 @@ export default async function EditEventPage({ params }: { params: { id: string }
     inviteUrl: g.secureToken ? `${baseUrl}/invite/${g.secureToken}` : null,
   }));
 
-  const currentTemplate = templates.find((t) => t.slug === event.templateSlug);
   const eventData = eventToInvitationData(event);
 
   return (

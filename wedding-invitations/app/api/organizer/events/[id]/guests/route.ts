@@ -21,6 +21,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
     }
 
+    if (!existing.templatePaidAt) {
+      return NextResponse.json({ error: "Evento aguarda pagamento" }, { status: 402 });
+    }
+
     const body = await request.json();
 
     // Suporte para importação em lote (bulk)
