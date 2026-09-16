@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { DESIGNER_COOKIE_NAME } from "@/lib/designer-auth";
 
 export async function POST(request: Request) {
-  cookies().set(DESIGNER_COOKIE_NAME, "", { httpOnly: true, path: "/", maxAge: 0 });
+  cookies().set("superadmin_token", "", { httpOnly: true, path: "/", maxAge: 0 });
 
   const accept = request.headers.get("accept") || "";
   if (accept.includes("application/json")) {
     return NextResponse.json({ ok: true });
   }
 
-  // 303 See Other garante que o browser faz GET para /designer/login em vez de repetir POST
-  const url = new URL("/designer/login", request.url);
+  const url = new URL("/superadmin/login", request.url);
   return NextResponse.redirect(url, { status: 303 });
 }
 
 export async function GET(request: Request) {
-  cookies().set(DESIGNER_COOKIE_NAME, "", { httpOnly: true, path: "/", maxAge: 0 });
-  const url = new URL("/designer/login", request.url);
+  cookies().set("superadmin_token", "", { httpOnly: true, path: "/", maxAge: 0 });
+  const url = new URL("/superadmin/login", request.url);
   return NextResponse.redirect(url, { status: 303 });
 }

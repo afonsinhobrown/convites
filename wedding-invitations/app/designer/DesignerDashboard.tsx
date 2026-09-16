@@ -234,11 +234,18 @@ export function DesignerDashboard({
             >
               <span>+ Adicionar modelo →</span>
             </Link>
-            <form action="/api/designer/logout" method="POST">
-              <button className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-                Sair
-              </button>
-            </form>
+            <button
+              onClick={async () => {
+                await fetch("/api/designer/logout", {
+                  method: "POST",
+                  headers: { Accept: "application/json" },
+                }).catch(() => {});
+                window.location.href = "/designer/login";
+              }}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </header>
