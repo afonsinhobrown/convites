@@ -15,18 +15,18 @@ export const metadata = {
 export default function HomePage() {
   return (
     <main className="relative min-h-screen bg-[#FDFBF7] text-gray-900">
-      {/* Imagem de Fundo Cultural de Casamentos com Transparência */}
+      {/* Imagem de Fundo Cultural Bem Nítida */}
       <div
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-bottom sm:bg-center bg-no-repeat opacity-50"
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-bottom sm:bg-center bg-no-repeat opacity-85"
         style={{
           backgroundImage: "url('/fundo.png')",
         }}
       />
-      {/* Camada de suavização e realce dourado */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-white/70 via-[#FDFBF7]/50 to-[#FDFBF7]/85" />
+      {/* Gradiente sutil apenas no topo para contraste perfeito do cabeçalho */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-[#FDFBF7]/70 via-transparent to-[#FDFBF7]/90" />
 
       {/* Header com logo DoReMi */}
-      <header className="sticky top-0 z-30 border-b border-[#C5A059]/25 bg-white/90 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-30 border-b border-[#C5A059]/30 bg-white/95 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -43,13 +43,13 @@ export default function HomePage() {
           <nav className="flex items-center gap-3 text-sm">
             <Link
               href="/login"
-              className="rounded-lg px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100/80 transition"
+              className="rounded-lg px-3.5 py-1.5 font-medium text-gray-700 hover:bg-gray-100 transition"
             >
               Entrar
             </Link>
             <Link
               href="/organizer/register"
-              className="rounded-lg bg-[#C5A059] px-3.5 py-1.5 font-medium text-white shadow-sm hover:bg-[#b08f4a] transition"
+              className="rounded-lg bg-[#C5A059] px-4 py-1.5 font-semibold text-white shadow-sm hover:bg-[#b08f4a] transition"
             >
               Criar conta
             </Link>
@@ -57,14 +57,39 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-6xl px-4 py-12">
+      <section className="relative z-10 mx-auto max-w-6xl px-4 py-10">
         <div className="text-center">
-          <h1 className="text-4xl sm:text-5xl font-serif-custom font-bold text-[#1A1A1A] tracking-tight">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C5A059]/15 px-3.5 py-1 text-xs font-semibold text-[#8B5A2B] border border-[#C5A059]/30">
+            ✨ Convites Digitais Interativos &amp; Personalizados
+          </span>
+          <h1 className="mt-3 text-4xl sm:text-5xl font-serif-custom font-bold text-[#1A1A1A] tracking-tight">
             Convites de casamento inesquecíveis
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm sm:text-base text-gray-700 font-medium leading-relaxed">
-            Escolha um dos nossos modelos, personalize e partilhe o convite digital com os seus
-            convidados. Com RSVP e confirmação por QR Code.
+          <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-700 font-medium leading-relaxed">
+            Celebre o amor em todas as suas tradições. Escolha o seu modelo favorito, personalize com
+            os dados do casal e partilhe com confirmação RSVP e QR Code.
+          </p>
+        </div>
+
+        {/* Banner Panorâmico com a Imagem em Alta Definição */}
+        <div className="mt-8 overflow-hidden rounded-3xl border-2 border-[#C5A059]/40 bg-white/90 p-2 shadow-2xl backdrop-blur-sm transition hover:border-[#C5A059]">
+          <div className="relative aspect-[16/6] w-full overflow-hidden rounded-2xl bg-white">
+            <Image
+              src="/fundo.png"
+              alt="Celebração do Amor e Tradições — DoReMi Eventos"
+              fill
+              priority
+              className="object-contain object-center scale-105 transition-transform duration-700 hover:scale-110"
+            />
+          </div>
+        </div>
+
+        <div className="mt-12 text-center">
+          <h2 className="text-2xl font-serif-custom font-bold text-gray-900">
+            Modelos de Convites Disponíveis
+          </h2>
+          <p className="text-xs text-gray-500 mt-1">
+            Selecione um modelo para pré-visualizar e começar a criar
           </p>
         </div>
 
