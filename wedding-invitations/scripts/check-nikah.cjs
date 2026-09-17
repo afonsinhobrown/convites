@@ -12,9 +12,8 @@ async function main() {
   console.log('SLUG:', t.slug);
   const lj = t.layoutJson;
   if (lj && typeof lj === 'object') {
-    // Show all keys and their sourceKey
     for (const [k, v] of Object.entries(lj)) {
-      console.log(`  [${k}] sourceKey=${v?.sourceKey}, customText="${v?.customText}", fontSize=${v?.fontSize}, width=${v?.width}, height=${v?.height}`);
+      console.log(`[${k}] x=${v?.x?.toFixed(1)} y=${v?.y?.toFixed(1)} w=${v?.width} h=${v?.height} fs=${v?.fontSize?.toFixed(1)} font="${v?.fontFamily}" align=${v?.textAlign} ct="${v?.customText}"`);
     }
   }
 }

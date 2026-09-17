@@ -724,76 +724,83 @@ return (
                 const f = layout[key as string] as LayoutField;
                 const isSelected = selected === key;
                 const locked = !!f.locked;
-                return (
-                  <Rnd
-                    key={key}
-                    size={{ width: f.width, height: f.height }}
-                    position={{ x: f.x, y: f.y }}
-                    scale={zoom}
-                    bounds="parent"
-                    disableDragging={locked}
-                    enableResizing={!locked}
-                    onDragStop={(_e, d) => updateField(key, { x: d.x, y: d.y })}
-                    onResizeStop={(_e, _dir, ref, _delta, pos) =>
-                      updateField(key, {
-                        width: parseInt(ref.style.width, 10),
-                        height: parseInt(ref.style.height, 10),
-                        x: pos.x,
-                        y: pos.y,
-                      })
-                    }
-                    onDragStart={() => setSelected(key)}
-                    onResizeStart={() => setSelected(key)}
-                    onMouseDown={() => setSelected(key)}
-                    className={isSelected ? "z-20" : "z-10"}
-                    style={{
-                      border: isSelected ? "2px solid #e11d48" : "1px dashed transparent",
-                      cursor: locked ? "default" : undefined,
-                    }}
-                    resizeHandleStyles={{
-                      bottomRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      bottomLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      topRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                      topLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
-                    }}
-                  >
-                    <div
-                      className="pointer-events-none absolute -top-6 left-0"
-                      style={{ zIndex: 50 }}
-                    >
-                      <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white shadow-sm">
-                        {fieldLabel(key)}
-                        {(key as string).includes("_cop") ? " (cópia)" : ""}
-                      </span>
-                    </div>
+                    const justifyClass =
+                      f.textAlign === "left"
+                        ? "justify-start text-left"
+                        : f.textAlign === "right"
+                        ? "justify-end text-right"
+                        : "justify-center text-center";
 
-                    {isSelected && (
-                      <div
-                        className="absolute -top-7 right-0 flex items-center gap-1 z-50 pointer-events-auto"
-                        style={{ zIndex: 60 }}
+                    return (
+                      <Rnd
+                        key={key}
+                        size={{ width: f.width, height: f.height }}
+                        position={{ x: f.x, y: f.y }}
+                        scale={zoom}
+                        bounds="parent"
+                        disableDragging={locked}
+                        enableResizing={!locked}
+                        onDragStop={(_e, d) => updateField(key, { x: d.x, y: d.y })}
+                        onResizeStop={(_e, _dir, ref, _delta, pos) =>
+                          updateField(key, {
+                            width: parseInt(ref.style.width, 10),
+                            height: parseInt(ref.style.height, 10),
+                            x: pos.x,
+                            y: pos.y,
+                          })
+                        }
+                        onDragStart={() => setSelected(key)}
+                        onResizeStart={() => setSelected(key)}
+                        onMouseDown={() => setSelected(key)}
+                        className={isSelected ? "z-20" : "z-10"}
+                        style={{
+                          border: isSelected ? "2px solid #e11d48" : "1px dashed transparent",
+                          cursor: locked ? "default" : undefined,
+                        }}
+                        resizeHandleStyles={{
+                          bottomRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                          bottomLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                          topRight: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                          topLeft: { background: "#e11d48", borderRadius: 4, width: 12, height: 12 },
+                        }}
                       >
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeField(key as string);
-                          }}
-                          className="flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white shadow-md hover:bg-red-700 transition cursor-pointer"
-                          title="Apagar este componente (ou prima Delete no teclado)"
+                        <div
+                          className="pointer-events-none absolute -top-6 left-0"
+                          style={{ zIndex: 50 }}
                         >
-                          <Trash2 className="h-3 w-3" />
-                          Apagar
-                        </button>
-                      </div>
-                    )}
-                    <div
-                      className={`flex h-full w-full items-center justify-center px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
-                      style={fieldStyle(f)}
-                    >
-                      {getFieldValueWithSource(key, f, SAMPLE_DATA)}
-                    </div>
-                  </Rnd>
-                );
+                          <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white shadow-sm">
+                            {fieldLabel(key)}
+                            {(key as string).includes("_cop") ? " (cópia)" : ""}
+                          </span>
+                        </div>
+
+                        {isSelected && (
+                          <div
+                            className="absolute -top-7 right-0 flex items-center gap-1 z-50 pointer-events-auto"
+                            style={{ zIndex: 60 }}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeField(key as string);
+                              }}
+                              className="flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white shadow-md hover:bg-red-700 transition cursor-pointer"
+                              title="Apagar este componente (ou prima Delete no teclado)"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Apagar
+                            </button>
+                          </div>
+                        )}
+                        <div
+                          className={`flex h-full w-full items-center ${justifyClass} px-1 ${fontFamilyClass(f.fontFamily)} ${locked ? "opacity-70" : ""}`}
+                          style={fieldStyle(f)}
+                        >
+                          {getFieldValueWithSource(key, f, SAMPLE_DATA)}
+                        </div>
+                      </Rnd>
+                    );
               })}
             </div>
           </div>

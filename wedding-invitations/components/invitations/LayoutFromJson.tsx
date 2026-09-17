@@ -73,12 +73,6 @@ export function LayoutFromJson({
       suppressHydrationWarning
       className="relative w-full aspect-[2/3] overflow-hidden rounded-lg"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={previewUrl ?? "/templates/magnolia-classica/fundo.png"}
-        alt="Convite"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
       <div
         suppressHydrationWarning
         className="absolute left-0 top-0"
@@ -89,6 +83,13 @@ export function LayoutFromJson({
           transformOrigin: "top left",
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={previewUrl ?? "/templates/magnolia-classica/fundo.png"}
+          alt="Convite"
+          className="pointer-events-none absolute left-0 top-0 select-none"
+          style={{ width: CANVAS.width, height: CANVAS.height }}
+        />
         {Object.entries(layoutJson).map(([key, f]) => {
           const justifyClass =
             f.textAlign === "left"
@@ -100,7 +101,7 @@ export function LayoutFromJson({
           return (
             <div
               key={key}
-              className={`flex items-center ${justifyClass} ${fontFamilyClass(f.fontFamily)}`}
+              className={`flex items-center px-1 ${justifyClass} ${fontFamilyClass(f.fontFamily)}`}
               style={{
                 position: "absolute",
                 left: f.x,
