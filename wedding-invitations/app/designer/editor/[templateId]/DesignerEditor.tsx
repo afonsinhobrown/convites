@@ -210,10 +210,26 @@ export function DesignerEditor({ template }: { template: InvitationTemplate }) {
     setSaved(false);
     setError(null);
     try {
+      // Sanitizar o layout antes de guardar: remover customText inválido ("undefined" string, null, vazio)
+      const sanitizedLayout: LayoutJson = {};
+      for (const [k, v] of Object.entries(layout)) {
+        if (!v) continue;
+        const field = { ...v };
+        if (
+          field.customText === undefined ||
+          field.customText === null ||
+          field.customText === "" ||
+          field.customText === "undefined"
+        ) {
+          delete (field as Record<string, unknown>).customText;
+        }
+        sanitizedLayout[k] = field;
+      }
+
       const res = await fetch(`/api/designer/templates/${template.slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ layoutJson: layout }),
+        body: JSON.stringify({ layoutJson: sanitizedLayout }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

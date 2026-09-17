@@ -525,8 +525,9 @@ export function getFieldValueWithSource(
   field: LayoutField | undefined,
   data: InvitationFieldData
 ): string {
-  if (field?.customText !== undefined && field?.customText !== null && field?.customText !== "") {
-    return field.customText;
+  const ct = field?.customText;
+  if (ct !== undefined && ct !== null && ct !== "" && ct !== "undefined") {
+    return ct;
   }
   const realKey = field?.sourceKey || key;
   const base = { ...data, sourceKey: undefined } as unknown as Record<string, string | undefined>;
@@ -680,11 +681,15 @@ export function extractTemplateDefaultData(template: {
   const brideName =
     getCustom("brideName") ||
     brideFromCouple ||
+    // Para templates Nikah que usam brideArabicName como nome da noiva
+    getCustom("brideArabicName") ||
     (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "JÚLIA");
 
   const groomName =
     getCustom("groomName") ||
     groomFromCouple ||
+    // Para templates Nikah que usam groomArabicName como nome do noivo
+    getCustom("groomArabicName") ||
     (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "ANTÓNIO");
 
   const ceremonyVenue =
@@ -736,7 +741,20 @@ export function extractTemplateDefaultData(template: {
     getCustom("invitationValues") ||
     (typeof demo.invitationValues === "string" && demo.invitationValues ? demo.invitationValues : "Amor · Respeito · Companheirismo · Sempre");
 
+  // Recolher TODOS os campos com customText definido pelo designer para persistir no demoData
+  // Isto garante que qualquer campo personalizado (ex: brideArabicName, groomArabicName, hora1, etc.)
+  // seja preservado fielmente mesmo que não esteja listado explicitamente acima.
+  const allCustomFields: Record<string, string> = {};
+  for (const [k, v] of Object.entries(layout)) {
+    if (v?.customText && v.customText.trim() && v.customText !== "undefined") {
+      allCustomFields[k] = v.customText.trim();
+    }
+  }
+
   return {
+    // Campos personalizados do designer (prevalecem sobre tudo)
+    ...allCustomFields,
+    // Campos padrão mapeados
     brideName,
     groomName,
     weddingDate: "2027-09-08",

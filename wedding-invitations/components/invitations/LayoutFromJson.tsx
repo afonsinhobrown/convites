@@ -116,7 +116,7 @@ export function LayoutFromJson({
                 letterSpacing: f.letterSpacing != null ? `${f.letterSpacing}px` : undefined,
                 lineHeight: f.lineHeight ?? 1.1,
                 overflow: "hidden",
-                wordBreak: "break-word",
+                whiteSpace: "nowrap",
               }}
             >
               {isPhotoField(key, f) && (() => {
