@@ -94,7 +94,7 @@ export function eventToInvitationData(event: Event): InvitationData {
     data_setembro: `${weekday}, ${d.getDate()} de ${monthLabel} de ${year}`,
     data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
     ele_esposa: `${event.groomName ?? "Lucas Whilo"} e Esposa`,
-    noivos: event.brideName && event.groomName ? `${event.brideName} & ${event.groomName}` : "JÚLIA & ANTÓNIO",
+    noivos: event.brideName && event.groomName ? `${event.brideName} & ${event.groomName}` : "FATIMA & OMAR",
     locationName: event.ceremonyVenue ?? "",
     locationAddress: event.ceremonyAddress ?? "",
     venue: event.ceremonyVenue ?? "",

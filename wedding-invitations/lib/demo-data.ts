@@ -1,25 +1,44 @@
 import type { InvitationData } from "@/components/invitations/types";
 
-// Dados fictícios usados na montra e como fallback dos previews sincronizados com o Designer.
+// Dados de amostra — devem ser IGUAIS ao SAMPLE_DATA do DesignerEditor
+// para que a montra mostre exactamente o mesmo que o designer vê.
 export const DEMO_DATA: InvitationData = {
-  guestName: "Lucas Whilo e Esposa",
-  brideName: "JÚLIA",
-  groomName: "ANTÓNIO",
-  day: "08",
-  month: "SETEMBRO",
-  year: "2027",
+  guestName: "SR. ABDUL E SRA. HALIMA",
+  brideName: "FATIMA",
+  groomName: "OMAR",
+  groomArabicName: "OMAR",
+  brideArabicName: "FATIMA",
+  mosque: "Mesquita Al-Iman",
+  mosqueLocation: "RUA DA BEIRA, MAPUTO",
+  groomParents: "SR. ALY E SRA. CATIJA",
+  brideParents: "Pais da Noiva",
+  noivos: "FATIMA & OMAR",
+  day: "12",
+  month: "DEZEMBRO",
+  year: "2026",
   time: "14:00",
-  venue: "HOTEL LUZ",
-  address: "Av. da Marginal, Maputo",
+  dia1: "01",
+  mes1: "02",
+  ano1: "27",
+  hora1: "14h00",
+  data_completa: "08/09/2027",
+  data_setembro: "Sábado, 26 de Setembro de 2026",
+  data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
+  ele_esposa: "Lucas Whilo e Esposa",
+  venue: "Mesquita Al-Iman",
+  address: "RUA DA BEIRA, MAPUTO",
+  locationName: "Mesquita Al-Iman",
+  locationAddress: "RUA DA BEIRA, MAPUTO",
   rsvpContact: "+258 84 000 0000",
   rsvpDate: "15 de Outubro",
-  invitationHeader: "Com a Bênção de Deus",
-  invitationIntro: "Temos a alegria de vos convidar para o nosso casamento",
-  invitationRomantic: "Duas vidas, dois corações, uma história para toda a vida.",
+  invitationHeader: "Com a Bênção de Allah",
+  invitationIntro: "Têm a honra de convidar o (a) Senhor (a)",
+  invitationRomantic: "A vossa presença será uma grande honra para as nossas famílias.",
   invitationHonor: "Será uma honra celebrar este momento tão especial na presença de vocês.",
   invitationFooter: "Juntos para sempre",
-  invitationValues: "Amor · Respeito · Companheirismo · Sempre",
+  invitationValues: "FÉ | RESPEITO | AMOR | FAMÍLIA | UNIÃO | SEMPRE",
 };
+
 
 // Normaliza os dados para o preview na montra.
 // Principio: o customText está dentro do layoutJson e é lido directamente pelo LayoutFromJson.

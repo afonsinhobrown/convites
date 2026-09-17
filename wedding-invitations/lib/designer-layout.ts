@@ -33,7 +33,8 @@ export const FIELD_ORDER = {
   brideParents: "Pais da Noiva",
   brideName: "Noiva",
   groomName: "Noivo",
-  noivos: "Noivos (JÚLIA & ANTÓNIO)",
+  noivos: "Noivos (FATIMA & OMAR)",
+  noivos_julia_antonio: "Noivos (JÚLIA & ANTÓNIO)",
   mosque: "Mesquita",
   mosqueLocation: "Local da Mesquita",
   invitationIntro: "Introdução",
@@ -379,7 +380,8 @@ export const DESIGNER_SAMPLE_DATA: Record<string, string> = {
   data_setembro: "Sábado, 26 de Setembro de 2026",
   data_islao: "14 de Rabīʿ al-Thānī de 1448 H",
   ele_esposa: "Lucas Whilo e Esposa",
-  noivos: "JÚLIA & ANTÓNIO",
+  noivos: "FATIMA & OMAR",
+  noivos_julia_antonio: "JÚLIA & ANTÓNIO",
   venue: "HOTEL LUZ",
   address: "Av. da Marginal, Maputo",
   locationName: "HOTEL LUZ",
@@ -449,8 +451,10 @@ function dataValue(key: string, data: Record<string, string | undefined>): strin
         data.noivos ||
         (data.brideName && data.groomName && data.brideName !== "Ana" && data.groomName !== "Zlatan"
           ? `${data.brideName} & ${data.groomName}`
-          : "JÚLIA & ANTÓNIO")
+          : "FATIMA & OMAR")
       );
+    case "noivos_julia_antonio":
+      return "JÚLIA & ANTÓNIO";
     case "locationName":
       return data.locationName ?? data.venue ?? "HOTEL LUZ";
     case "locationAddress":
@@ -668,7 +672,7 @@ export function extractTemplateDefaultData(template: {
   const coupleText =
     getCustom("noivos") ||
     (typeof demo.noivos === "string" ? demo.noivos : undefined) ||
-    (layout.noivos ? "JÚLIA & ANTÓNIO" : undefined);
+    (layout.noivos ? "FATIMA & OMAR" : undefined);
 
   let brideFromCouple = "";
   let groomFromCouple = "";
@@ -681,12 +685,12 @@ export function extractTemplateDefaultData(template: {
   const brideName =
     getCustom("brideName") ||
     brideFromCouple ||
-    (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "JÚLIA");
+    (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "FATIMA");
 
   const groomName =
     getCustom("groomName") ||
     groomFromCouple ||
-    (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "ANTÓNIO");
+    (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "OMAR");
 
   const ceremonyVenue =
     getCustom("locationName") ||
