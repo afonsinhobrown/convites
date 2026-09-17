@@ -27,7 +27,7 @@ export function TemplatePreview({
   mode?: InvitationMode;
   className?: string;
 }) {
-  const data = customData ?? demoDataToInvitationData(demoData, layoutJson);
+  const data = customData ?? demoDataToInvitationData(demoData);
 
   if (!data) {
     return (

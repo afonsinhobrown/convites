@@ -269,6 +269,7 @@ export function NewTemplateForm() {
             <div className="relative rounded-2xl border border-gray-200 bg-gray-50 p-4">
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="relative h-44 w-32 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={previewUrl}
                     alt="Preview do fundo"

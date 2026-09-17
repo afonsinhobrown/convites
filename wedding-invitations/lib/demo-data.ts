@@ -24,7 +24,7 @@ export const DEMO_DATA: InvitationData = {
 // Normaliza os dados para o preview na montra.
 // Principio: o customText está dentro do layoutJson e é lido directamente pelo LayoutFromJson.
 // Esta função só fornece valores de exemplo para campos DINÂMICOS (sem customText).
-export function demoDataToInvitationData(demo: unknown, _layoutJson?: unknown): InvitationData {
+export function demoDataToInvitationData(demo: unknown): InvitationData {
   const d = (demo && typeof demo === "object" ? demo : {}) as Record<string, unknown>;
   const str = (v: unknown): string | undefined =>
     typeof v === "string" && v && v !== "undefined" ? v : undefined;
