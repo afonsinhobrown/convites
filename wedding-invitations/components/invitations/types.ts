@@ -38,4 +38,6 @@ export interface InvitationData {
   invitationValues?: string;
   photoLeft?: string;
   photoRight?: string;
+  // Campos dinâmicos definidos pelo designer (ex: brideArabicName_cop1, hora1_cop1, etc.)
+  [key: string]: string | undefined;
 }

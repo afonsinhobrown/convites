@@ -681,15 +681,11 @@ export function extractTemplateDefaultData(template: {
   const brideName =
     getCustom("brideName") ||
     brideFromCouple ||
-    // Para templates Nikah que usam brideArabicName como nome da noiva
-    getCustom("brideArabicName") ||
     (typeof demo.brideName === "string" && demo.brideName ? demo.brideName : "JÚLIA");
 
   const groomName =
     getCustom("groomName") ||
     groomFromCouple ||
-    // Para templates Nikah que usam groomArabicName como nome do noivo
-    getCustom("groomArabicName") ||
     (typeof demo.groomName === "string" && demo.groomName ? demo.groomName : "ANTÓNIO");
 
   const ceremonyVenue =
