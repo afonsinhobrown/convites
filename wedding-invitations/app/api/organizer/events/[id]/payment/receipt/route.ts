@@ -52,10 +52,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const pdfBuffer = generatePaymentReceiptPdf(eventInfo, paymentInfo);
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
+      status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="recibo_${paymentInfo.reference}.pdf"`,
+        "Content-Length": pdfBuffer.length.toString(),
       },
     });
   } catch (error) {
