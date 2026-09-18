@@ -151,7 +151,7 @@ export function InvitesPanel({
       } else {
         setFeeSuccess("Pedido enviado para o seu telefone. Confirme com o PIN no M-Pesa.");
       }
-    } catch (err) {
+    } catch {
       setFeeError("Falha no pagamento. Por favor, verifique os seus dados de pagamento e o seu saldo disponível, e tente novamente.");
     } finally {
       setFeeLoading(false);

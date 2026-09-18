@@ -116,7 +116,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
           "Pedido de pagamento enviado para o seu telefone. Confirme a transação inserindo o seu PIN no M-Pesa."
         );
       }
-    } catch (err) {
+    } catch {
       setError("Falha no pagamento. Por favor, verifique os seus dados de pagamento e o seu saldo disponível, e tente novamente.");
     } finally {
       setLoading(false);
