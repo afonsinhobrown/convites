@@ -41,6 +41,14 @@ interface WhatsAppLogReportItem {
   messageText: string;
 }
 
+interface PaymentInfo {
+  reference: string;
+  amountMzn: number;
+  type: string;
+  date: string;
+  method: string;
+}
+
 function addPdfHeader(doc: jsPDF, event: EventInfo, reportTitle: string) {
   const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -413,6 +421,75 @@ export function generateWhatsAppHistoryPdf(
       y += 7;
     });
   }
+
+  addPdfFooter(doc);
+  return Buffer.from(doc.output("arraybuffer"));
+}
+
+/**
+ * RECIBO DE PAGAMENTO
+ */
+export function generatePaymentReceiptPdf(event: EventInfo, payment: PaymentInfo): Buffer {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a5" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  addPdfHeader(doc, event, "Recibo de Pagamento");
+
+  let y = 50;
+
+  doc.setFillColor(252, 250, 246);
+  doc.setDrawColor(197, 160, 89);
+  doc.roundedRect(14, y, pageWidth - 28, 80, 2, 2, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(26, 26, 26);
+  doc.text("Detalhes da Transação", 20, y + 10);
+
+  y += 25;
+  
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text("Referência:", 20, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(26, 26, 26);
+  doc.text(payment.reference, 50, y);
+
+  y += 10;
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(100, 100, 100);
+  doc.text("Tipo:", 20, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(26, 26, 26);
+  doc.text(payment.type, 50, y);
+
+  y += 10;
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(100, 100, 100);
+  doc.text("Data:", 20, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(26, 26, 26);
+  const dateStr = new Date(payment.date).toLocaleDateString("pt-MZ", {
+    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+  });
+  doc.text(dateStr, 50, y);
+
+  y += 10;
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(100, 100, 100);
+  doc.text("Método:", 20, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(26, 26, 26);
+  doc.text(payment.method, 50, y);
+
+  y += 15;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(26, 26, 26);
+  doc.text("Total Pago:", 20, y);
+  doc.setTextColor(197, 160, 89);
+  doc.text(`${payment.amountMzn} MT`, 50, y);
 
   addPdfFooter(doc);
   return Buffer.from(doc.output("arraybuffer"));

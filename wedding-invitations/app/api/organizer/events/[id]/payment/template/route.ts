@@ -66,7 +66,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const reference = isSandboxActive ? `TPL_SB_${shortId}_${timeSuffix}` : `TPL_${shortId}_${timeSuffix}`;
 
     const origin = request.headers.get("origin") || request.headers.get("referer") || "https://convites-beta.vercel.app";
-    const returnUrl = `${origin}/organizer/events/${event.id}?paid=1`;
+    const returnUrl = `${origin}/organizer/events/${event.id}/payment/success?type=template`;
 
     const charge = await createNetShopCharge({
       amountMZN: priceMzn,

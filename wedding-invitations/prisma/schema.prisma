@@ -252,7 +252,7 @@ model SystemConfig {
   invitationFeeCents Int      @default(2500) // taxa por convidado: 25 MT
   bimExchangeRate    Int      @default(64) // MT/USD
   netshopEnabled     Boolean  @default(true)
-  sandboxEnabled     Boolean  @default(true)
+  sandboxEnabled     Boolean  @default(false)
   updatedAt          DateTime @updatedAt
 }
 

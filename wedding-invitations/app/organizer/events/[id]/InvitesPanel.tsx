@@ -92,7 +92,7 @@ export function InvitesPanel({
         const res = await fetch(`/api/organizer/events/${eventId}/payment/guest-fee`);
         const data = await res.json();
         if (data.paid) {
-          router.refresh();
+          router.push(`/organizer/events/${eventId}/payment/success?type=guest-fee`);
         }
       } catch {
         // silencioso
@@ -142,7 +142,7 @@ export function InvitesPanel({
 
       if (data.paid) {
         setFeeModalOpen(false);
-        router.refresh();
+        router.push(`/organizer/events/${eventId}/payment/success?type=guest-fee`);
         return;
       }
 
@@ -152,7 +152,7 @@ export function InvitesPanel({
         setFeeSuccess("Pedido enviado para o seu telefone. Confirme com o PIN no M-Pesa.");
       }
     } catch (err) {
-      setFeeError(err instanceof Error ? err.message : "Erro ao processar pagamento");
+      setFeeError("Falha no pagamento. Por favor, verifique os seus dados de pagamento e o seu saldo disponível, e tente novamente.");
     } finally {
       setFeeLoading(false);
     }

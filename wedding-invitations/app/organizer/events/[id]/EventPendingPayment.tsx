@@ -53,7 +53,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
         const res = await fetch(`/api/organizer/events/${event.id}/payment/template`);
         const data = await res.json();
         if (data.paid) {
-          router.refresh();
+          router.push(`/organizer/events/${event.id}/payment/success?type=template`);
         }
       } catch {
         // silencioso
@@ -105,7 +105,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
       }
 
       if (data.paid) {
-        router.refresh();
+        router.push(`/organizer/events/${event.id}/payment/success?type=template`);
         return;
       }
 
@@ -117,7 +117,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
         );
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao processar pagamento");
+      setError("Falha no pagamento. Por favor, verifique os seus dados de pagamento e o seu saldo disponível, e tente novamente.");
     } finally {
       setLoading(false);
     }
