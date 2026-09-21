@@ -3,7 +3,7 @@ import { toMozMsisdn } from "@/lib/phone";
 
 const NETSHOP_API_URL = "https://www.netshop.co.mz/api/v1";
 
-export type NetShopMethod = "mpesa" | "emola" | "card";
+export type NetShopMethod = "mpesa" | "emola" | "card" | "bci";
 
 export type NetShopChargeResult = {
   id: string;
@@ -15,7 +15,7 @@ export type NetShopChargeResult = {
 };
 
 /**
- * Cria uma cobrança via NetShop API v1 (M-Pesa ou Cartão BIM)
+ * Cria uma cobrança via NetShop API v1 (M-Pesa, Cartão BIM ou Cartão BCI)
  */
 export async function createNetShopCharge(params: {
   amountMZN: number;
@@ -26,22 +26,23 @@ export async function createNetShopCharge(params: {
   description?: string;
 }): Promise<NetShopChargeResult> {
   const apiKey = process.env.NETSHOP_API_KEY;
-  const selectedMethod: NetShopMethod = params.method || "mpesa";
+  const selectedMethod: NetShopMethod = params.method || "card";
 
   // Roteamento de carteira NetShop:
-  // Se for cartão BIM usa NETSHOP_WALLET_ID_BIM (318938)
-  // Se for M-Pesa / móvel usa NETSHOP_WALLET_ID_MPESA (555633)
-  const isBimOrCard = selectedMethod === "card";
-  const walletId = isBimOrCard
-    ? process.env.NETSHOP_WALLET_ID_BIM
-    : process.env.NETSHOP_WALLET_ID_MPESA;
+  // M-Pesa / móvel -> NETSHOP_WALLET_ID_MPESA (555633)
+  // Cartão BIM     -> NETSHOP_WALLET_ID_BIM (318938)
+  // Cartão BCI     -> NETSHOP_WALLET_ID_BCI (654027)
+  const isBimCard = selectedMethod === "card";
+  const isBciCard = selectedMethod === "bci";
+  const walletEnv = isBciCard
+    ? "NETSHOP_WALLET_ID_BCI"
+    : isBimCard
+      ? "NETSHOP_WALLET_ID_BIM"
+      : "NETSHOP_WALLET_ID_MPESA";
+  const walletId = process.env[walletEnv];
 
   if (!apiKey || !walletId) {
-    throw new Error(
-      `Credenciais da NetShop em falta no .env (${
-        isBimOrCard ? "NETSHOP_WALLET_ID_BIM" : "NETSHOP_WALLET_ID_MPESA"
-      })`
-    );
+    throw new Error(`Credenciais da NetShop em falta no .env (${walletEnv})`);
   }
 
   // Normalizar qualquer formato moçambicano para MSISDN puro (25884XXXXXXX / 25885XXXXXXX)
@@ -50,7 +51,7 @@ export async function createNetShopCharge(params: {
   const payload: Record<string, unknown> = {
     amount: Math.round(params.amountMZN),
     reference: params.reference,
-    method: selectedMethod,
+    method: isBciCard ? "card" : selectedMethod,
   };
 
   if (selectedMethod === "mpesa" && phone) {
@@ -105,6 +106,7 @@ export async function getNetShopCharge(chargeId: string): Promise<{
   const wallets = [
     process.env.NETSHOP_WALLET_ID_MPESA,
     process.env.NETSHOP_WALLET_ID_BIM,
+    process.env.NETSHOP_WALLET_ID_BCI,
   ].filter(Boolean) as string[];
 
   for (const walletId of wallets) {

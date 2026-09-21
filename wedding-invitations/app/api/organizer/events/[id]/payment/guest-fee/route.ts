@@ -36,7 +36,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const feePerGuestMzn = Math.round(config.invitationFeeCents / 100); // 25 MT
 
     const body = await request.json().catch(() => ({}));
-    const method: NetShopMethod = body.method === "card" ? "card" : "mpesa";
+    const method: NetShopMethod =
+      body.method === "bci" ? "bci" : body.method === "card" ? "card" : "mpesa";
     const phoneRaw = body.phone ? String(body.phone).trim() : event.rsvpContact;
     const phone = normalizeMozPhone(phoneRaw) || phoneRaw;
 

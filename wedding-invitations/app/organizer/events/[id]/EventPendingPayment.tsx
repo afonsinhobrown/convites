@@ -35,7 +35,7 @@ interface EventPendingPaymentProps {
 
 export function EventPendingPayment({ event, template, sandboxAllowed = true }: EventPendingPaymentProps) {
   const router = useRouter();
-  const [method, setMethod] = useState<"mpesa" | "card">("mpesa");
+  const [method, setMethod] = useState<"mpesa" | "card" | "bci">("card");
   const [isSandbox, setIsSandbox] = useState(false);
 
   const [phone, setPhone] = useState("");
@@ -78,7 +78,7 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
       }
       if (!localDigits.startsWith("84") && !localDigits.startsWith("85")) {
         setError(
-          "Para pagar via M-Pesa é necessário um número Vodacom (iniciado por 84 ou 85). Se utiliza outro operador/banco, selecione 'BIM / Cartão'."
+          "Para pagar via M-Pesa é necessário um número Vodacom (iniciado por 84 ou 85). Se utiliza outro operador/banco, selecione 'BIM / Visa' ou 'BCI / Visa'."
         );
         return;
       }
@@ -293,21 +293,19 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
 
               <form onSubmit={handlePay} className="mt-5 space-y-4">
                 {/* Seleção do Método */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
+                    disabled
                     onClick={() => {
                       setMethod("mpesa");
                       setError(null);
                     }}
-                    className={`flex flex-col items-center justify-center rounded-xl border p-3.5 text-center transition ${
-                      method === "mpesa"
-                        ? "border-red-600 bg-red-50 text-red-700 font-semibold"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className="flex cursor-not-allowed flex-col items-center justify-center rounded-xl border border-gray-200 bg-gray-100 p-3.5 text-center text-gray-400 opacity-60"
                   >
-                    <Smartphone className="h-5 w-5 mb-1 text-red-600" />
+                    <Smartphone className="h-5 w-5 mb-1 text-gray-400" />
                     <span className="text-sm">M-Pesa</span>
+                    <span className="text-[10px]">Indisponível</span>
                   </button>
 
                   <button
@@ -323,7 +321,23 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
                     }`}
                   >
                     <CreditCard className="h-5 w-5 mb-1 text-[#8B5A2B]" />
-                    <span className="text-sm">BIM / Cartão</span>
+                    <span className="text-sm">BIM / Visa</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMethod("bci");
+                      setError(null);
+                    }}
+                    className={`flex flex-col items-center justify-center rounded-xl border p-3.5 text-center transition ${
+                      method === "bci"
+                        ? "border-[#8B5A2B] bg-[#8B5A2B]/10 text-[#8B5A2B] font-semibold"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <CreditCard className="h-5 w-5 mb-1 text-[#8B5A2B]" />
+                    <span className="text-sm">BCI / Visa</span>
                   </button>
                 </div>
 
@@ -358,7 +372,9 @@ export function EventPendingPayment({ event, template, sandboxAllowed = true }: 
                   </div>
                 ) : (
                   <div className="rounded-xl bg-[#FDFBF7] p-3 text-xs text-gray-600 border border-gray-200">
-                    Ao clicar em Pagar, será direcionado para o ambiente seguro do Millennium BIM / Cartão para introduzir os dados do cartão.
+                    {method === "bci"
+                      ? "Ao clicar em Pagar, será direcionado para o ambiente seguro do Banco BCI / Visa para introduzir os dados do cartão."
+                      : "Ao clicar em Pagar, será direcionado para o ambiente seguro do Millennium BIM / Visa para introduzir os dados do cartão."}
                   </div>
                 )}
 
